@@ -1,0 +1,20 @@
+EXPERIMENT: HeightExperiment version:1.0
+Variables:
+Factors:
+    sex enum "men","women"
+Outcome:
+   height in R  
+
+Hypothesis: Differential    
+
+Design:
+ Sampling: Random   
+ Groups: by sex sizing 25
+ Protocol: Random
+ Analyses:                  
+    DescriptiveStatitics:
+        Avg()
+        Avg(sex)
+        Avg(sex="men")
+        StdDev()
+    NHST: T-student(Grouping({sex}),0.05)

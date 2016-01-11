@@ -1,0 +1,21 @@
+EXPERIMENT:myExperiment version:1.0
+
+Variables:
+Factors: 
+    var1 enum 5.3, 7.8, 33.02
+Outcome:
+   outcome in N  
+
+Hypothesis: Differential 
+
+Design:
+ Sampling: Random   
+ Groups: by var1 sizing 30
+ Protocol: Random
+ Analyses:           
+    DescriptiveStatitics:
+        Avg()
+        Median()
+        StdDev()
+    NHST:
+        ANOVA(,)

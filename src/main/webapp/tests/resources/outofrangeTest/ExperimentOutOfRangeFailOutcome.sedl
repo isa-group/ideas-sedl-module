@@ -1,0 +1,28 @@
+EXPERIMENT:myExperiment version:1.0
+
+Variables:
+Factors:    
+    var1 enum "value1","value2", "value3"
+    var2 enum "value4", "value5"
+Outcome:
+   outcome in N  
+
+Hypothesis: Differential    
+
+Design:
+ Sampling: Random   
+ Groups: by var1 sizing 30
+ Protocol: Random
+ Analyses:                  
+    DescriptiveStatitics:
+        Avg()
+        Avg(var1)
+        Avg(var2)
+        Avg(var1="value2")
+        Avg(Filter(var1="value2").Grouping({var1}))
+        Avg(Filter(var1="value1").Grouping({var2}))
+        Avg(Filter(var1).Grouping({var2}))
+        Median(Filter(var1).Grouping({var2}))
+        Median()
+        StdDev()
+    NHST: T-student(Grouping({var2}),0.05) 

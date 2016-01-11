@@ -1,0 +1,259 @@
+[	
+	{
+        "id": "MultipleComparison Test",
+        "description": "Check results of multiple comparison are corrects",
+        "opUri": "/language/operation/multiplecomparison/execute",
+        "opMethod": "POST",
+        "parameters": 
+        {
+            "id": "multiplecomparison",
+            "content": "",
+            "fileUri": "/tests/resources/computestatTest/HeightExperimentalDescription.sedl"
+        },
+        "results": [
+			{"status":"OK","message":"Statistical test are correct","htmlMessage":null,"data":null,"context":null,"fileUri":"/tests/resources/computestatTest/HeightExperimentalDescription.sedl","annotations":null,"customStruct":null}
+		]
+    },
+    
+    {
+        "id": "SmallSampling Test Fail Case",
+        "description": "Check results of small sampling contains errors",
+        "opUri": "/language/operation/smallsampling/execute",
+        "opMethod": "POST",
+        "parameters": 
+        {
+            "id": "smallsampling",
+            "content": "",
+            "fileUri": "/tests/resources/computestatTest/HeightExperimentalDescription.sedl"
+        },
+        "results": [
+			{"status":"OK","message":"Check for sample size problems.","htmlMessage":null,"data":null,"context":null,"fileUri":"/tests/resources/computestatTest/HeightExperimentalDescription.sedl","annotations":[{"row":"11","column":"1","text":"The size of the sample used in the experiment is too small","type":"warning"}],"customStruct":null}
+		]
+    },
+    {
+        "id": "SmallSampling Test OK Case",
+        "description": "Check results of small sampling are ok",
+        "opUri": "/language/operation/smallsampling/execute",
+        "opMethod": "POST",
+        "parameters": 
+        {
+            "id": "smallsampling",
+            "content": "",
+            "fileUri": "/tests/resources/computestatTest/ExperimentalDescriptionMeanTestOK.sedl"
+        },
+        "results": [
+			{"status":"OK","message":"Experiment sample size is correct.","htmlMessage":null,"data":null,"context":null,"fileUri":"/tests/resources/computestatTest/ExperimentalDescriptionMeanTestOK.sedl","annotations":null,"customStruct":null}
+		]
+    },
+    
+    {
+        "id": "checkComputeStat[Mean-OK-Example]",
+        "description": "Check results of mean ok example [ExperimentalCSV1]",
+        "opUri": "/language/operation/computestatscalc/execute",
+        "opMethod": "POST",
+        "parameters": 
+        {
+            "id": "computestatscalc",
+            "content": "",
+            "fileUri": "/tests/resources/computestatTest/ExperimentalDescriptionMeanTestOK.sedl",
+            "auxArg0": "/tests/resources/datasets/ExperimentalCSV1.csv"
+        },
+        "results": [
+			{"status":"OK","message":"Compute Stats Operation:<br><br> - Mean(): 4.942857142857142;<br><br> - Mean(.proj(var1 )): 4.885714285714286; 4.6571428571428575; 5.2857142857142865;<br><br> - Mean(Filter(var1).grouping(var2 )): 4.88; 5.000000000000001;<br><br> - Mean(Filter(var1=\"value1\").grouping(var2 )): 4.885714285714286; NaN;<br><br> - Mean(Filter(var1=\"value1\").grouping(var2 )): 4.885714285714286; NaN;<br>","htmlMessage":null,"data":null,"context":null,"fileUri":"/tests/resources/computestatTest/ExperimentalDescriptionMeanTestOK.sedl","annotations":null,"customStruct":null}
+		]
+    },
+    {
+        "id": "checkComputeStat[Median-OK-Example]",
+        "description": "Check results of median ok example [ExperimentalCSV1]",
+        "opUri": "/language/operation/computestatscalc/execute",
+        "opMethod": "POST",
+        "parameters": 
+        {
+            "id": "computestatscalc",
+            "content": "",
+            "fileUri": "/tests/resources/computestatTest/ExperimentalDescriptionMedianTestOK.sedl",
+            "auxArg0": "/tests/resources/datasets/ExperimentalCSV1.csv"
+        },
+        "results": [
+			{"status":"OK","message":"Compute Stats Operation:<br><br> - Median(.proj(var1 )): 4.8; 4.9; 5.6;<br><br> - Median(.proj(var1 ).proj(var2 )): 4.8; 4.9; 5.6; 4.8; 5.3;<br><br> - Median(Filter(var1).grouping(var2 )): 4.8; 5.3;<br><br> - Median(Filter(var1).grouping(var2 )): 4.8; 5.3;<br>","htmlMessage":null,"data":null,"context":null,"fileUri":"/tests/resources/computestatTest/ExperimentalDescriptionMedianTestOK.sedl","annotations":null,"customStruct":null}
+		]
+    },
+    {
+        "id": "checkComputeStat[Mode-OK-Example]",
+        "description": "Check results of mode ok example [ExperimentalCSV1]",
+        "opUri": "/language/operation/computestatscalc/execute",
+        "opMethod": "POST",
+        "parameters": 
+        {
+            "id": "computestatscalc",
+            "content": "",
+            "fileUri": "/tests/resources/computestatTest/ExperimentalDescriptionModeTestOK.sedl",
+            "auxArg0": "/tests/resources/datasets/ExperimentalCSV1.csv"
+        },
+        "results": [
+			{"status":"OK","message":"Compute Stats Operation:<br><br> - Mode(.proj(var1 )): 4.8; 5.1; 5.1;<br><br> - Mode(.proj(var1 ).proj(var2 )): 4.8; 5.1; 5.1; 4.8; 5.3;<br><br> - Mode(Filter(var1).grouping(var2 )): 4.8; 5.3;<br><br> - Mode(Filter(var1).grouping(var2 )): 4.8; 5.3;<br>","htmlMessage":null,"data":null,"context":null,"fileUri":"/tests/resources/computestatTest/ExperimentalDescriptionModeTestOK.sedl","annotations":null,"customStruct":null}
+		]
+    },
+    {
+        "id": "checkComputeStat[Standard_Desviation-OK-Example]",
+        "description": "Check results of standard desviation ok example [ExperimentalCSV1]",
+        "opUri": "/language/operation/computestatscalc/execute",
+        "opMethod": "POST",
+        "parameters": 
+        {
+            "id": "computestatscalc",
+            "content": "",
+            "fileUri": "/tests/resources/computestatTest/ExperimentalDescriptionStandardDesviationTestOK.sedl",
+            "auxArg0": "/tests/resources/datasets/ExperimentalCSV1.csv"
+        },
+        "results": [
+			{"status":"OK","message":"Compute Stats Operation:<br><br> - StandardDeviation(.proj(var1 )): 0.6833291853200798; 0.4981598792617912; 0.5329930887479324;<br><br> - StandardDeviation(.proj(var1 ).proj(var2 )): 0.6833291853200798; 0.4981598792617912; 0.5329930887479324; 0.6063002556489647; 0.6508735388970454;<br><br> - StandardDeviation(Filter(var1).grouping(var2 )): 0.6063002556489647; 0.6508735388970454;<br><br> - StandardDeviation(Filter(var1).grouping(var2 )): 0.6063002556489647; 0.6508735388970454;<br>","htmlMessage":null,"data":null,"context":null,"fileUri":"/tests/resources/computestatTest/ExperimentalDescriptionStandardDesviationTestOK.sedl","annotations":null,"customStruct":null}
+		]
+    },
+    {
+        "id": "checkComputeStat[Variance-OK-Example]",
+        "description": "Check results of standard variance ok example [ExperimentalCSV1]",
+        "opUri": "/language/operation/computestatscalc/execute",
+        "opMethod": "POST",
+        "parameters": 
+        {
+            "id": "computestatscalc",
+            "content": "",
+            "fileUri": "/tests/resources/computestatTest/ExperimentalDescriptionVarianceTestOK.sedl",
+            "auxArg0": "/tests/resources/datasets/ExperimentalCSV1.csv"
+        },
+        "results": [
+			{"status":"OK","message":"Compute Stats Operation:<br><br> - Variance(.proj(var1 )): 0.46693877551019725; 0.24816326530611832; 0.28408163265305575;<br><br> - Variance(.proj(var1 ).proj(var2 )): 0.46693877551019725; 0.24816326530611832; 0.28408163265305575; 0.36760000000000304; 0.4236363636363514;<br><br> - Variance(Filter(var1).grouping(var2 )): 0.36760000000000304; 0.4236363636363514;<br><br> - Variance(Filter(var1).grouping(var2 )): 0.36760000000000304; 0.4236363636363514;<br>","htmlMessage":null,"data":null,"context":null,"fileUri":"/tests/resources/computestatTest/ExperimentalDescriptionVarianceTestOK.sedl","annotations":null,"customStruct":null}
+		]
+    },
+    {
+        "id": "checkComputeStat[InterquartileRange-OK-Example]",
+        "description": "Check results of InterquartileRange ok example [ExperimentalCSV1]",
+        "opUri": "/language/operation/computestatscalc/execute",
+        "opMethod": "POST",
+        "parameters": 
+        {
+            "id": "computestatscalc",
+            "content": "",
+            "fileUri": "/tests/resources/computestatTest/ExperimentalDescriptionInterquartileRangeTestOK.sedl",
+            "auxArg0": "/tests/resources/datasets/ExperimentalCSV1.csv"
+        },
+        "results": [
+			{"status":"OK","message":"Compute Stats Operation:<br><br> - InterquartileRange(.proj(var1 )): 1.0999999999999996; 0.8999999999999995; 0.6000000000000005;<br><br> - InterquartileRange(.proj(var1 ).proj(var2 )): 1.0999999999999996; 0.8999999999999995; 0.6000000000000005; 0.7999999999999998; 1.3999999999999995;<br><br> - InterquartileRange(Filter(var1).grouping(var2 )): 0.7999999999999998; 1.3999999999999995;<br><br> - InterquartileRange(Filter(var1).grouping(var2 )): 0.7999999999999998; 1.3999999999999995;<br>","htmlMessage":null,"data":null,"context":null,"fileUri":"/tests/resources/computestatTest/ExperimentalDescriptionInterquartileRangeTestOK.sedl","annotations":null,"customStruct":null}
+		]
+    },
+    {
+        "id": "checkComputeStat[Range-OK-Example]",
+        "description": "Check results of range ok example [ExperimentalCSV1]",
+        "opUri": "/language/operation/computestatscalc/execute",
+        "opMethod": "POST",
+        "parameters": 
+        {
+            "id": "computestatscalc",
+            "content": "",
+            "fileUri": "/tests/resources/computestatTest/ExperimentalDescriptionRangeTestOK.sedl",
+            "auxArg0": "/tests/resources/datasets/ExperimentalCSV1.csv"
+        },
+        "results": [
+			{"status":"OK","message":"Compute Stats Operation:<br><br> - Range(.proj(var1 )): 2.1999999999999997; 1.5; 1.7000000000000002;<br><br> - Range(.proj(var1 ).proj(var2 )): 2.1999999999999997; 1.5; 1.7000000000000002; 2.1999999999999997; 2.0;<br><br> - Range(Filter(var1).grouping(var2 )): 2.1999999999999997; 2.0;<br><br> - Range(Filter(var1).grouping(var2 )): 2.1999999999999997; 2.0;<br>","htmlMessage":null,"data":null,"context":null,"fileUri":"/tests/resources/computestatTest/ExperimentalDescriptionRangeTestOK.sedl","annotations":null,"customStruct":null}
+		]
+    },
+    {
+        "id": "HightExperiemntalExample",
+        "description": "Check results of height experiment example it's ok",
+        "opUri": "/language/operation/computestatscalc/execute",
+        "opMethod": "POST",
+        "parameters": 
+        {
+            "id": "computestatscalc",
+            "content": "",
+            "fileUri": "/tests/resources/computestatTest/HeightExperimentalDescription.sedl",
+            "auxArg0": "/tests/resources/datasets/HeightExperimentalDatasetCSV.csv"
+        },
+        "results": [
+			{"status":"OK","message":"Compute Stats Operation:<br><br> - Mean(): 67.46516322000001;<br><br> - Mean(.proj(sex )): 70.22848619999999; 64.70184024;<br><br> - Mean(Filter(sex=\"men\")): 70.22848619999999;<br><br> - StandardDeviation(): 3.7570413763133685;<br><br> - StandardDeviation(): 3.7570413763133685;<br><br> - T-student(.grouping(sex )): 4.078769191198832E-110;<br><br> - T-student(.grouping(sex )): 4.078769191198832E-110;<br>","htmlMessage":null,"data":null,"context":null,"fileUri":"/tests/resources/computestatTest/HeightExperimentalDescription.sedl","annotations":null,"customStruct":null}
+		]
+    },
+    
+    {
+        "id": "OutOfRange csv Test case [OutOfRangeOK]",
+        "description": "Check results of out of range it's ok",
+        "opUri": "/language/operation/outofrangecsv/execute",
+        "opMethod": "POST",
+        "parameters": 
+        {
+            "id": "outofrangecsv",
+            "content": "",
+            "fileUri": "/tests/resources/outofrangeTest/ExperimentOutOfRangeOK.sedl",
+            "auxArg0": "/tests/resources/datasets/ExperimentalCSV1.csv"
+        },
+        "results": [
+			{"status":"OK","message":"Range of variables are correct","htmlMessage":null,"data":null,"context":null,"fileUri":"/tests/resources/outofrangeTest/ExperimentOutOfRangeOK.sedl","annotations":null,"customStruct":null}
+		]
+    },
+    {
+        "id": "OutOfRange csv Test case [OutOfRangeFailOutcomes]",
+        "description": "Check if results of out of range fail in outcomes values",
+        "opUri": "/language/operation/outofrangecsv/execute",
+        "opMethod": "POST",
+        "parameters": 
+        {
+            "id": "outofrangecsv",
+            "content": "",
+            "fileUri": "/tests/resources/outofrangeTest/ExperimentOutOfRangeFailOutcome.sedl",
+            "auxArg0": "/tests/resources/datasets/ExperimentalCSV1.csv"
+        },
+        "results": [
+			{"status":"OK","message":"<div class='opError'><br>There are any level in outcome 'outcome' out of range. -Severity: ERROR</div>","htmlMessage":null,"data":null,"context":null,"fileUri":"/tests/resources/outofrangeTest/ExperimentOutOfRangeFailOutcome.sedl","annotations":null,"customStruct":null}
+		]
+    },
+    {
+        "id": "OutOfRange csv Test case [OutOfRangeVariablesNotFound]",
+        "description": "Check if results of out of range fail in variables",
+        "opUri": "/language/operation/outofrangecsv/execute",
+        "opMethod": "POST",
+        "parameters": 
+        {
+            "id": "outofrangecsv",
+            "content": "",
+            "fileUri": "/tests/resources/outofrangeTest/ExperimentOutOfRangeOK.sedl",
+            "auxArg0": "/tests/resources/datasets/ExperimentalCSVEmpty.csv"
+        },
+        "results": [
+			{"status":"OK","message":"<div class='opError'><br>[ERROR/WARNING] Variable 'var1' it's Out Of Range, or maybe is necessary to specify a dataset. -Severity: WARNING<br>[ERROR/WARNING] Variable 'var2' it's Out Of Range, or maybe is necessary to specify a dataset. -Severity: WARNING<br>[ERROR/WARNING] Variable 'outcome' it's Out Of Range, or maybe is necessary to specify a dataset. -Severity: WARNING</div>","htmlMessage":null,"data":null,"context":null,"fileUri":"/tests/resources/outofrangeTest/ExperimentOutOfRangeOK.sedl","annotations":null,"customStruct":null}
+		]
+    },
+    {
+        "id": "OutOfRange Test case [OutOfRangeNoCsvOK]",
+        "description": "Check if results of out of range are OK",
+        "opUri": "/language/operation/outofrangecsv/execute",
+        "opMethod": "POST",
+        "parameters": 
+        {
+            "id": "outofrangecsv",
+            "content": "",
+            "fileUri": "/tests/resources/outofrangeTest/ExperimentOutOfRangeNoCSVOK.sedl",
+            "auxArg0": "/tests/resources/datasets/ExperimentalCSVEmpty.csv"
+        },
+        "results": [
+			{"status":"OK","message":"<div class='opError'><br>[ERROR/WARNING] Variable 'outcome' it's Out Of Range, or maybe is necessary to specify a dataset. -Severity: WARNING</div>","htmlMessage":null,"data":null,"context":null,"fileUri":"/tests/resources/outofrangeTest/ExperimentOutOfRangeNoCSVOK.sedl","annotations":null,"customStruct":null}
+		]
+    },
+    {
+        "id": "OutOfRange Test case [OutOfRangeNoCsvFail]",
+        "description": "Check if results of out of range contains errors",
+        "opUri": "/language/operation/outofrangecsv/execute",
+        "opMethod": "POST",
+        "parameters": 
+        {
+            "id": "outofrangecsv",
+            "content": "",
+            "fileUri": "/tests/resources/outofrangeTest/ExperimentOutOfRangeNoCSVFail.sedl",
+            "auxArg0": "/tests/resources/datasets/ExperimentalCSVEmpty.csv"
+        },
+        "results": [
+			{"status":"OK","message":"<div class='opError'><br>[ERROR/WARNING] Variable 'var1' it's Out Of Range, or maybe is necessary to specify a dataset. -Severity: WARNING<br>[ERROR/WARNING] Variable 'outcome' it's Out Of Range, or maybe is necessary to specify a dataset. -Severity: WARNING</div>","htmlMessage":null,"data":null,"context":null,"fileUri":"/tests/resources/outofrangeTest/ExperimentOutOfRangeNoCSVFail.sedl","annotations":null,"customStruct":null}
+		]
+    }
+    
+]
