@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
-import es.us.isa.ideas.common.AppAnnotations;
-import es.us.isa.ideas.common.AppResponse;
-import es.us.isa.ideas.common.AppResponse.Status;
+import es.us.isa.ideas.module.common.AppAnnotations;
+import es.us.isa.ideas.module.common.AppResponse;
+import es.us.isa.ideas.module.common.AppResponse.Status;
 import es.us.isa.ideas.module.controller.BaseLanguageController;
 import es.us.isa.sedl.core.BasicExperiment;
 import es.us.isa.sedl.core.Experiment;
@@ -24,6 +24,7 @@ import es.us.isa.sedl.core.util.xml.XMLUnmarshaller;
 import es.us.isa.sedl.marshaller.SEDL4PeopleMarshaller;
 import es.us.isa.sedl.marshaller.SEDL4PeopleStringTemplateMarshaller;
 import es.us.isa.sedl.marshaller.SEDL4PeopleUnmarshaller;
+import es.us.isa.sedl.module.sedl4people.SEDL4PeopleExtensionPointsUnmarshallerImplementation;
 import es.us.isa.sedl.semantic.SEDLSemanticChecker;
 
 
@@ -69,6 +70,7 @@ public class SEDLLanguageController extends BaseLanguageController {
 		
 		AppResponse appResponse = new AppResponse();
 		SEDL4PeopleUnmarshaller unmarshaller = new SEDL4PeopleUnmarshaller();
+                unmarshaller.setEpUnmarshaller(new SEDL4PeopleExtensionPointsUnmarshallerImplementation());
 		Experiment experiment = unmarshaller.fromString(content);
 		
 		boolean problems = false;

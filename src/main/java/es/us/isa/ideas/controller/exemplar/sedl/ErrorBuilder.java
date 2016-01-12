@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-import es.us.isa.ideas.common.AppAnnotations;
-import es.us.isa.ideas.common.AppAnnotations.Type;
+import es.us.isa.ideas.module.common.AppAnnotations;
+import es.us.isa.ideas.module.common.AppAnnotations.Type;
 import es.us.isa.sedl.core.BasicExperiment;
 import es.us.isa.sedl.core.util.Error;
 import es.us.isa.sedl.core.util.Error.ERROR_SEVERITY;
@@ -126,17 +126,16 @@ public class ErrorBuilder {
 			ann.setColumn("1");
 			ann.setText(val.getMessage());
 			if (val.getSeverity().equals(
-					es.us.isa.exemplar.commons.util.Error.ERROR_SEVERITY.ERROR)) {
+					ERROR_SEVERITY.ERROR)) {
 				ann.setType(Type.ERROR);
 			} else if (val.getSeverity().equals(
-					es.us.isa.exemplar.commons.util.Error.ERROR_SEVERITY.FATAL)) {
+					ERROR_SEVERITY.FATAL)) {
 				ann.setType(Type.FATAL);
 			} else if (val.getSeverity().equals(
-					es.us.isa.exemplar.commons.util.Error.ERROR_SEVERITY.INFO)) {
+					ERROR_SEVERITY.INFO)) {
 				ann.setType(Type.INFO);
-			} else if (val
-					.getSeverity()
-					.equals(es.us.isa.exemplar.commons.util.Error.ERROR_SEVERITY.WARNING)) {
+			} else if (val.getSeverity().equals(
+                                        ERROR_SEVERITY.WARNING)) {
 				ann.setType(Type.WARNING);
 			}
 			retList.add(ann);

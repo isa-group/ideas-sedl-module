@@ -6,8 +6,8 @@ import java.util.List;
 import org.antlr.v4.runtime.tree.RuleNode;
 
 
-import es.us.isa.ideas.common.AppResponse;
-import es.us.isa.ideas.common.AppResponse.Status;
+import es.us.isa.ideas.module.common.AppResponse;
+import es.us.isa.ideas.module.common.AppResponse.Status;
 import es.us.isa.sedl.analysis.errors.SEDL4PeopleReferenceDelegate;
 import es.us.isa.sedl.analysis.operations.information.computestats.ComputeStats;
 import es.us.isa.sedl.analysis.operations.information.NumberOfBlocks;
@@ -20,8 +20,8 @@ import es.us.isa.sedl.core.BasicExperiment;
 import es.us.isa.sedl.core.design.FullySpecifiedExperimentalDesign;
 import es.us.isa.sedl.core.execution.Execution;
 import es.us.isa.sedl.marshaller.SEDL4PeopleUnmarshaller;
-import es.us.isa.exemplar.commons.util.Error;
 import es.us.isa.sedl.runtime.analysis.validation.ValidationError;
+import es.us.isa.sedl.core.util.Error;
 
 class AnalyserDelegate {
 
@@ -262,7 +262,7 @@ class AnalyserDelegate {
 					if(!errors.isEmpty()){		//if there are an error
 						message = message + "<br><div class='opError'>There are errors in operations or dataset, maybe results are wrong: <br>";
 						for(Object ve : errors){
-							message = message + ((Error)ve).getDescription() + "<br>";
+							message = message + ((Error)ve).getMessage()+ "<br>";
 						}
 						message = message +"</div><br>";
 						FullySpecifiedExperimentalDesign design = (FullySpecifiedExperimentalDesign) exp.getDesign().getExperimentalDesign();
@@ -272,10 +272,11 @@ class AnalyserDelegate {
 						List  lError = sedlDelegate.fillValidationError(lCtx, sedl4peopleUnmarsh.getTokens(), errors);
                                                                                                         
 						response.setAnnotations(ErrorBuilder.buildAnnotationsFromValidationErrors(lError));
-					}
-					for(int i =0; i < operation.getResults().size();i++){
+					}else{
+                                            for(int i =0; i < operation.getResults().size();i++){
 						message = message + "<br> - " + operation.renderResults();
-					}
+                                            }
+                                        }
 					message = message + "<br>";
 					System.out.println("[INFO] Operation"+operation.toString());
 				}
