@@ -13,11 +13,12 @@
 	    http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.2.xsd            
 	">
 
-<context:component-scan base-package="es.us.isa.ideas" />
+    <context:component-scan base-package="es.us.isa.ideas.controller.exemplar.sedl" />
 
-<mvc:annotation-driven />
+    <!-- Tiles configuration -->
+    <import resource="config/tiles.xml" />
+    <mvc:resources mapping="/**" location="/"/>
 
-<!-- Tiles configuration -->
-<import resource="config/tiles.xml" />
-<mvc:resources mapping="/**" location="/" />
+    <mvc:annotation-driven />
+
 </beans>

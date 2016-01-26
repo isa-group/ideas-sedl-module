@@ -1,112 +1,110 @@
 {
-				id: "sedl-language",
-				extension: "sedl",
-				name: "SEDL",
-                                defaultFileName:"ExperimentalDescription",
-				formats: [
-				 	{
-				 		format: "sedl",
-				 		editorModeId: "ace/mode/SEDL4People",
-				 		_editorModeURI: "mode-SEDL4People.js",
-				 		editorThemeId: "ace/theme/SEDL4People",
-				 		_editorThemeURI: "theme-SEDL4People.js",
-				 		checkLanguage: "true"
-				 	},
-				 	{
-				 		format: "xml",
-				 		editorModeId: "ace/mode/xml",
-				 		_editorModeURI: "mode-xml.js",
-				 		checkLanguage: "false"
-				 	}
-				],
-				 
-				operations: [
+    "id": "sedl-language",
+    "extension": "sedl",
+    "name": "SEDL",
+    "defaultFileName":"ExperimentalDescription",
+    "formats": [
+        {
+        "format": "sedl",
+                "editorModeId": "ace/mode/SEDL4People",
+                "_editorModeURI": "mode-SEDL4People.js",
+                "editorThemeId": "ace/theme/SEDL4People",
+                "_editorThemeURI": "theme-SEDL4People.js",
+                "checkLanguage": "true"
+        },
+        {
+        "format": "xml",
+                "editorModeId": "ace/mode/xml",
+                "_editorModeURI": "mode-xml.js",
+                "checkLanguage": "false"
+        }
+        ],
+    "operations": [
+        {
+        "id": "smallsampling",
+                "name": "Small Sampling",
+                "data": {},
+                "_remoteExecution": "true",
+                "action": "function(result) {}"
+        },
+        {
+        "id": "multiplecomparison",
+                "name": "Multiple Comparison",
+                "data": {},
+                "_remoteExecution": "true",
+                "action": "function(result) {}"
+        },
+        {
+        "id": "outofrange",
+                "name": "Out of Range",
+                "data": {},
+                "_remoteExecution": "false",
+                "action": "function(operationStructure, fileUri) {
+                var res;
+                var view;
+                CommandApi.doDocumentOperation(operationStructure.id, operationStructure.data, EditorManager.currentUri, function(result){
+                res = result;
+                        $.ajax('/ideas - sedl - language/language/operationView/'+operationStructure.id, {
+                        'type' : 'get',
+                                'data' : operationStructure.id,
+                                'success' : function(result) {
+                                view = result;
+                                        console.log('[INFO]'+result.document);
 
-				             {
-				            	 id: "smallsampling",
-				            	 name: "Small Sampling",
-				            	 data: {},
-				            	 _remoteExecution: "true",
-				            	 action: "function(result) {}"
-				             },
-				             {
-				            	 id: "multiplecomparison",
-				            	 name: "Multiple Comparison",
-				            	 data: {},
-				            	 _remoteExecution: "true",
-				            	 action: "function(result) {}"
-				             },
-				             {
-				            	 id: "outofrange",
-				            	 name: "Out of Range",
-				            	 data: {},
-				            	 _remoteExecution: "false",
-				            	 action: "function(operationStructure, fileUri) {
-				            	 	var res;
-				            	 	var view;
-				            	 	CommandApi.doDocumentOperation(operationStructure.id,operationStructure.data,EditorManager.currentUri, function(result){
-				            	 		res = result;
-				            	 		$.ajax('/ideas-sedl-language/language/operationView/'+operationStructure.id, {
-											'type' : 'get', 
-											'data' : operationStructure.id,
-											'success' : function(result) {
-												view = result;
-												console.log('[INFO]'+result.document);
-												
-											},
-											'onError' : function(result) { 
-											console.log('[ERROR] '+result);
-											},
-											'async' : false, 
-										});
-										
-										CommandApi.fetchFileContentsBeforeExecutingOperation(operationStructure, fileUri, 'csv', 
-								       	 	'outofrangecsv', 'OUT OF RANGE CONFIGURATION', view, 
-							         	 	'RUN other file', function(result){}, function(result){});
-							         	 	
-				            	 	},false);
-				            	 	console.log(res);
-				            	 	loadOutOfRangeConfigurations(res.data);
-				            	 	
-				            	 }"
-				             },
-				             {
-				            	 id: "computestats",
-				            	 name: "Compute Stats",
-				            	 data: {},
-				            	  _remoteExecution: "false",
-				            	 action: "function(operationStructure, fileUri) {
-				            	 	var res;
-				            	 	var view;
-				            	 	CommandApi.doDocumentOperation(operationStructure.id,operationStructure.data,EditorManager.currentUri, function(result){
-				            	 		res = result;
-				            	 		$.ajax('/ideas-sedl-language/language/operationView/'+operationStructure.id, {
-											'type' : 'get', 
-											'data' : operationStructure.id,
-											'success' : function(result) {
-												view = result;
-												console.log('[INFO]'+result.document);
-												
-											},
-											'onError' : function(result) { 
-											console.log('[ERROR] '+result);
-											},
-											'async' : false, 
-										});
-										
-										CommandApi.fetchFileContentsBeforeExecutingOperation(operationStructure, fileUri, 'csv', 
-								       	 	'computestatscalc', 'COMPUTE STATS CONFIGURATION', view, 
-							         	 	'RUN other file', function(result){}, function(result){});
-							         	 	
-				            	 	},false);
-				            	 	//console.log(res);
-				            	 	loadConfigurations(res.data);
-				            	 	
-				            	 }"
-				             }
-				             
-				             ],
-				             
-				inspectorLoader: "function(loader, format) {}"
+                                },
+                                'onError' : function(result) {
+                                console.log('[ERROR] '+result);
+                                },
+                                'async' : false,
+                        });
 
-			}
+                        CommandApi.fetchFileContentsBeforeExecutingOperation(operationStructure, fileUri, 'csv',
+                        'outofrangecsv', 'OUT OF RANGE CONFIGURATION', view,
+                        'RUN other file', function(result){}, function(result){});
+
+                }, false);
+                console.log(res);
+                loadOutOfRangeConfigurations(res.data);
+
+        }"
+        },
+        {
+        "id": "computestats",
+        "name": "Compute Stats",
+        "data": {},
+        "_remoteExecution": "false",
+        "action": "function(operationStructure, fileUri) {
+                var res;
+                var view;
+                CommandApi.doDocumentOperation(operationStructure.id, operationStructure.data, EditorManager.currentUri, function(result){
+                res = result;
+                        $.ajax('/ideas - sedl - language/language/operationView/'+operationStructure.id, {
+                        'type' : 'get',
+                                'data' : operationStructure.id,
+                                'success' : function(result) {
+                                view = result;
+                                        console.log('[INFO]'+result.document);
+
+                                },
+                                'onError' : function(result) {
+                                console.log('[ERROR] '+result);
+                                },
+                                'async' : false,
+                        });
+
+                        CommandApi.fetchFileContentsBeforeExecutingOperation(operationStructure, fileUri, 'csv',
+                        'computestatscalc', 'COMPUTE STATS CONFIGURATION', view,
+                        'RUN other file', function(result){}, function(result){});
+
+                }, false);
+                //console.log(res);
+                loadConfigurations(res.data);
+
+        }"
+        }
+
+        ],
+        "inspectorLoader": "function(loader, format) {}",
+        "helpURI":"/view/help/SEDL.html"
+
+}
