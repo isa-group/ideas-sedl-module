@@ -409,7 +409,7 @@
                     <resourceBundles>
                         <resourceBundle>es.us.isa.sedl:SEDL4People:${SEDL.version}</resourceBundle>
                     </resourceBundles>
-                    <outputDirectory>view/help</outputDirectory>
+                    <outputDirectory>${basedir}/src/main/webapp/view/help</outputDirectory>
                 </configuration>
                 <executions>
                     <execution>
@@ -418,7 +418,7 @@
                         </goals>
                     </execution>
                 </executions>
-                </plugin>
+            </plugin>
         </plugins>
     </build>
 
