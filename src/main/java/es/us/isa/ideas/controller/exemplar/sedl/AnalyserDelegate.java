@@ -22,6 +22,7 @@ import es.us.isa.sedl.core.execution.Execution;
 import es.us.isa.sedl.marshaller.SEDL4PeopleUnmarshaller;
 import es.us.isa.sedl.runtime.analysis.validation.ValidationError;
 import es.us.isa.sedl.core.util.Error;
+import es.us.isa.sedl.module.sedl4people.SEDL4PeopleExtensionPointsUnmarshallerImplementation;
 
 class AnalyserDelegate {
 
@@ -44,7 +45,7 @@ class AnalyserDelegate {
 
 	private SmallSampling sampling = new SmallSampling();
 	private MultipleComparison multipleComparison = new MultipleComparison();
-	private SEDL4PeopleUnmarshaller sedl4peopleUnmarsh = new SEDL4PeopleUnmarshaller();
+	private SEDL4PeopleUnmarshaller sedl4peopleUnmarsh;
 	private SEDL4PeopleReferenceDelegate sedlDelegate = new SEDL4PeopleReferenceDelegate();
 
 	private OutOfRange outOfRange = new OutOfRange();
@@ -53,6 +54,8 @@ class AnalyserDelegate {
 
 	public AnalyserDelegate() {
 		super();
+                sedl4peopleUnmarsh= new SEDL4PeopleUnmarshaller();
+                sedl4peopleUnmarsh.setEpUnmarshaller(new SEDL4PeopleExtensionPointsUnmarshallerImplementation());
 	}
 
 	public AppResponse numberOfBlocks(String content, String fileUri) {
