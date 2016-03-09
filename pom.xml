@@ -247,7 +247,7 @@
         </dependency>				        
         
         <!-- SEDL Dependencies -->
-        
+             
         <dependency>
             <groupId>es.us.isa.sedl</groupId>
             <artifactId>SEDL-core</artifactId>	
@@ -420,6 +420,23 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>2.7</version>
+	</plugin>
+	<plugin>
+                <artifactId>maven-remote-resources-plugin</artifactId>
+                <version>1.5</version>
+                <configuration>
+                    <resourceBundles>
+                        <resourceBundle>es.us.isa.sedl:SEDL4People:${SEDL.version}</resourceBundle>
+                    </resourceBundles>
+                    <outputDirectory>${basedir}/src/main/webapp/view/help</outputDirectory>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>process</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
