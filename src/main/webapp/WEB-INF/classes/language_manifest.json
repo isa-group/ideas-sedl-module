@@ -17,6 +17,12 @@
                 "editorModeId": "ace/mode/xml",
                 "_editorModeURI": "mode-xml.js",
                 "checkLanguage": "false"
+        },
+        {
+        "format": "json",
+                "editorModeId": "ace/mode/json",
+                "_editorModeURI": "mode-json.js",
+                "checkLanguage": "false"
         }
         ],
     "operations": [

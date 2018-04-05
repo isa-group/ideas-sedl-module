@@ -25,6 +25,8 @@ import es.us.isa.sedl.marshaller.SEDL4PeopleMarshaller;
 import es.us.isa.sedl.marshaller.SEDL4PeopleStringTemplateMarshaller;
 import es.us.isa.sedl.marshaller.SEDL4PeopleUnmarshaller;
 import es.us.isa.sedl.module.sedl4people.SEDL4PeopleExtensionPointsUnmarshallerImplementation;
+import es.us.isa.sedl.sedl4json.JSONMarshaller;
+import es.us.isa.sedl.sedl4json.JSONUnmarshaller;
 import es.us.isa.sedl.semantic.SEDLSemanticChecker;
 
 
@@ -150,7 +152,35 @@ public class SEDLLanguageController extends BaseLanguageController {
 			
 			appResponse.setData(data);
 			appResponse.setFileUri(fileUri);
-		} else {
+		}else if (currentFormat.equals("sedl") && desiredFormat.equals("json") ) {
+                    try {
+                        SEDL4PeopleUnmarshaller sedl4peopleUnmarsh = new SEDL4PeopleUnmarshaller();
+                        Experiment exp = sedl4peopleUnmarsh.fromString(content);
+                        JSONMarshaller marshaller=new JSONMarshaller();
+                        appResponse.setData(marshaller.asString(exp));
+                        appResponse.setFileUri(fileUri);
+                        appResponse.setStatus(Status.OK);
+                    } catch(Exception e){
+                        appResponse.setStatus(Status.ERROR);
+			appResponse.setMessage(e.getMessage());
+			e.printStackTrace();
+			return appResponse;
+                    }
+                }else if (currentFormat.equals("json") && desiredFormat.equals("sedl") ) {
+                    try {
+                        JSONUnmarshaller sedl4peopleUnmarsh = new JSONUnmarshaller();
+                        Experiment exp = sedl4peopleUnmarsh.fromString(content);
+                        SEDL4PeopleMarshaller marshaller=new SEDL4PeopleMarshaller();
+                        appResponse.setData(marshaller.asString(exp));
+                        appResponse.setFileUri(fileUri);
+                        appResponse.setStatus(Status.OK);
+                    } catch(Exception e){
+                        appResponse.setStatus(Status.ERROR);
+			appResponse.setMessage(e.getMessage());
+			e.printStackTrace();
+			return appResponse;
+                    }
+                } else {
 			appResponse.setStatus(Status.ERROR);
 			appResponse.setMessage("Not a valid conversion: from " + currentFormat + " to " + desiredFormat);
 		}
