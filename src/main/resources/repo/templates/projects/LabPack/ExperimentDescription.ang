@@ -1,0 +1,384 @@
+<div id="sedl-wrapper">
+    <form action="">
+        <h1> Experiment <input ng-model="model.id"></h1>
+        <ul class="nav nav-tabs">
+            <li class="active"><a data-toggle="tab" href="#DescriptionAndContext">Context</a></li>
+            <li><a data-toggle="tab" href="#Variables">Variables</a></li>
+            <li><a data-toggle="tab" href="#Hypotheses">Hypotheses</a></li>
+            <li><a data-toggle="tab" href="#Design">Design</a></li>
+            <li><a data-toggle="tab" href="#Configuration">Conduction</a></li>
+            <li><a data-toggle="tab" href="#Analyses">Analyses</a></li>
+        </ul>
+        <div class="tab-content">
+            <section id="DescriptionAndContext" class="tab-pane fade in active">
+                Description:<br>
+                <textarea ng-model="model.notes[0]" cols="80" rows="12"> </textarea>
+            </section>
+            <section id="Hypotheses" class="tab-pane fade">
+            <h2>
+                <a href="" ng-click="addNewHypothesis()">
+                    <span class="glyphicon glyphicon-plus" aria-hidden="true" style="color:#9e9e9e;margin-right:10px;">
+                    </span>
+                </a>
+                Hypotheses:
+            </h2>
+            <table>
+                <tr>
+                    <th>ID</th>
+                    <th>Dependent Variable</th>
+                    <th>Hypothesis type</th>
+                    <th>Independent Variables</th>
+                    <th></th>
+                </tr>
+                <tr ng-repeat="h in model.hypotheses">
+                    <td>
+                        <input ng-model="h.id" size="10">
+                    </td>
+                    <td>
+                        <select ng-model="h.dependentVariable">
+                                <option ng-repeat="va in model.design.variables.variable" value="{{va.name}}" ng-disabled="va['@type']!='Outcome'">
+                                    {{va.name}}
+                                </option>
+                        </select>
+                    </td>
+                    <td>
+                        <select ng-model="h['@type']">
+                            <option value="DifferentialHypothesis"> is impacted significantly by </option>
+                            <option value="AssociationalHypothesis"> is correlated with </option>
+                        </select>
+                    </td>
+                    <td>
+                        <div ng-repeat="v in h.independentVariables">
+                            <select ng-model="v">
+                                <option ng-repeat="va in model.design.variables.variable" value="{{va.name}}" ng-disabled="va['@type']=='Outcome'">{{va.name}}</option>
+                            </select>
+                            <span ng-if="h.independentVariables.length>1">
+                                <a href="" ng-click="removeIndependentVariableFromHypothesis(h.id,v)">
+                                    <span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:brown;"></span>
+                                </a>
+                            </span>
+                        </div>
+                        <a href="" ng-click="addNewIndependentVariableToHypothesis(h)"><span class="glyphicon glyphicon-plus" aria-hidden="true" style="color:#9e9e9e;margin-right:10px;"></span></a>
+                    </td>
+                    <td><a href="" ng-click="removeHypothesis(h)"><span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:brown;"></span></a></td>
+                </tr>
+            </table>
+
+            </section>
+            <section id="Constants" class="tab-pane fade">
+            <h2>
+                <a href="" ng-click="addDesignParameter()">
+                    <span class="glyphicon glyphicon-plus" aria-hidden="true" style="color:#9e9e9e;margin-right:10px;">
+                    </span>
+                </a>
+                Design Parameters:</h2>
+            <ul>
+                <li ng-repeat="c in model.design.designParameters">
+                    <input ng-model="c.name"> : <input ng-model="c.value"> <a href="" ng-click="removeDesignParameter(c)"><span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:brown;"></span></a>
+                </li> 
+            </ul>
+
+        </section>
+
+        <section id="Variables" class="tab-pane fade">
+
+
+            <h2>
+                <a href="" ng-click="addNewVariable()">
+                    <span class="glyphicon glyphicon-plus" aria-hidden="true" style="color:#9e9e9e;margin-right:10px;">
+                    </span>
+                </a>
+                Variables
+            </h2>
+
+            <table class="table-striped">
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Domain</th>
+                    <th>Units</th>
+                    <th></th>
+                </tr>
+                <tr ng-repeat="v in model.design.variables.variable">
+                    <td><input ng-model="v.name"></td>
+                    <td>
+                        <select ng-model="v['@type']">
+                            <option value="ControllableFactor">Controllable factor</option>
+                            <option value="NonControllableFactor">Not controllable factor</option>
+                            <option value="Outcome">Outcome</option>
+                            <option value="Nuisance">Nuisance</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select ng-model="v.domain['@type']">
+                            <option value="ExtensionDomain">
+                                One of: 
+                            </option>
+                            <option value="IntensionDomain">
+                                Of type 
+                            </option>
+                        </select>
+                        <div ng-if="v.domain['@type'] === 'ExtensionDomain'">
+                            <ul>
+                                <li ng-repeat="l in v.domain.levels">
+                                    <input ng-model="l.value" size="10">
+                                    <a href="" ng-click="removeLevelFromVariable(v.name,l.value)">
+                                        <span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:brown;"></span>
+                                    </a>
+                                </li>
+                            </ul>
+                            <a href="" ng-click="addNewLevelToVariable(v.name)">
+                                <span class="glyphicon glyphicon-plus" aria-hidden="true" style="color:#9e9e9e;margin-right:10px;">
+                            </span>
+                            </a>
+                            
+                        </div>
+                        <div ng-if="v.domain['@type'] === 'IntensionDomain'"> 
+                            <div ng-repeat="constraint in v.domain.constraint">
+                                <div ng-if="constraint['@type'] === 'FundamentalSetConstraint'">
+                                    <select ng-model="constraint.fundamentalSet">
+                                        <option value="R">float</option>
+                                        <option value="Z">integer</option>
+                                        <option value="B">boolean</option>
+                                    </select>
+                                </div>
+                                <div ng-if="constraint['@type'] === 'IntervalConstraint'">
+                                    in [<input ng-model="constraint.min" size="5">, <input ng-model="constraint.max" size="5">]
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td><input ng-model="v.units"></td> 
+                    <td><a href="" ng-click="removeVariable(v)"><span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:brown;"></span></a></td>
+                </tr> 
+            </table>
+
+
+
+        </section>
+        <section id="Design" class="tab-pane fade">
+            <h2>Design:</h2>
+            <h3>
+                <a href="" ng-click="addGroup()">
+                    <span class="glyphicon glyphicon-plus" aria-hidden="true" style="color:#9e9e9e;margin-right:10px;"></span>
+                </a>
+                Gropus:
+            </h3>
+            <table class="table-striped">
+                <tr>
+                    <th>Name</th>
+                    <th>Size</th>
+                    <th></th>
+                </tr>
+                <tr>
+                <tr ng-repeat="g in model.design.experimentalDesign.groups">
+                    <td><input ng-model="g.name"></td>
+                    <td><input ng-model="g.sizing.value"></td>
+                    <td><a href="" ng-click="removeGroup(g)"><span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:brown;"></span></a></td>
+                </tr>                                        
+            </table>
+
+            <h3>
+                <a ref="" ng-click="addProtocolStep()">
+                    <span class="glyphicon glyphicon-plus" aria-hidden="true" style="color:#9e9e9e;margin-right:10px;">
+                    </span>
+                </a>
+                Protocol
+            </h3>
+            <table class="table-striped">
+                <tr ng-repeat="step in model.design.experimentalDesign.experimentalProtocol.steps">
+                    <td>
+                        <select ng-model="step['@type']">
+                            <option ng-value="Measurement">Measurement</option>
+                            <option ng-value="Treatment">Treatment</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select ng-model="step.group">
+                            <option ng-repeat="g in model.design.experimentalDesign.groups" value="{{g.name}}">{{g.name}}</option>
+                        </select> 
+
+                        <div ng-repeat="assignment in step.variableValuation">
+                            <input ng-model="assignment.variable.name"> : <input ng-model="assignment.level.value">
+                        </div>
+                    </td>
+                    <td>
+                        <a href="" ng-click="removeProtocolStep(step)">
+                            <span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:brown;"></span>
+                        </a>
+                    </td>
+                </tr>
+            </table>
+            </section>
+            <section id="Analyses" class="tab-pane fade">
+            <h3>
+                <a href="" ng-click="addAnalysisGroup()">
+                    <span class="glyphicon glyphicon-plus" aria-hidden="true" style="color:#9e9e9e;margin-right:10px;">
+                    </span>
+                </a>
+                Analyses
+            </h3>
+            <div ng-repeat="analysisGroup in model.design.experimentalDesign.intendedAnalyses">
+                <fieldset>
+                    <h4><input ng-model="analysisGroup.id">
+                        <a href="" ng-click="removeAnalysisGroup(analysisGroup.id)">
+                            <span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:brown;"></span>
+                        </a>
+                    </h4>
+                    <table class="table-striped">
+                        <tr>
+                            <th>Analysis Type</th>
+                            <th>Details</th>
+                            <th>Data spec</th>
+                            <th></th>
+                        </tr>
+                        <tr ng-repeat="a in analysisGroup.analyses">                                      
+                            <td>
+                                <select ng-model="a.statistic[0]['@type']">
+                                    <optgroup label="Descriptive Statistics - Cental tendency">
+                                        <option value="Mean">Mean</option>
+                                        <option value="Median">Median</option>
+                                        <option value="Mode">Mode</option>
+                                    </optgroup>
+                                    <optgroup label="Descriptive Statistics - Dispersion">
+                                        <option value="StandardDeviation">Standard Deviation</option>
+                                        <option value="IQR">Inter Quartile Range</option>
+                                        <option value="Range">Range</option>
+                                    </optgroup>
+                                    <option value="Ranking">Ranking</option>
+                                    <option value="NHST">Null Hypothesis Test</option>
+                                </select>                                                        
+                            </td>
+                            <td>
+                                <div ng-if="a.statistic[0]['@type'] === 'NHST'">
+                                    Test:<select ng-model="a.statistic[0].name">
+                                        <optgroup label="Normality Tests">
+                                            <option value="Kolmogorov-Smirnov">Kolmogorov-Smirnov</option>
+                                        </optgroup>
+                                        <optgroup label="Homocedasticity Tests">
+                                            <option value="Levene">Levene</option>
+                                        </optgroup>
+                                        <optgroup label="Differences of means/ranks">
+                                            <option value="TTest">T-Student</option>
+                                            <option value="ANOVA">Anova</option>
+                                            <option value="Wilcoxon">Wilcoxon</option>
+                                        </optgroup>
+                                    </select>
+                                    <br>
+                                    Alpha:<input ng-model="a.statistic[0].alpha" size="5">
+                                </div>
+                            </td>
+                            <td>
+                                <div ng-repeat="p in a.statistic[0].datasetSpecification.projections">
+                                    <div ng-if="p['@type'] === 'Projection'">
+                                        of <div ng-repeat="v in p.projectedVairables">
+                                            <select ng-model="v">
+                                                <option ng-repeat="va in model.design.variables.variable" value="{{va.name}}">{{va.name}}</option>
+                                            </select>,
+                                        </div>
+                                        <br>
+                                    </div>
+                                </div>
+
+                                <div ng-repeat="g in a.statistic[0].datasetSpecification.groupings">
+                                    by
+                                    <div ng-repeat="v in g.projectedVariables">
+                                        <select ng-model="v">
+                                            <option ng-repeat="var in model.design.variables.variable" value="{{var .name}}">{{var .name}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div ng-if="a.statistic[0].datasetSpecification.filters.length !== 0"><br>
+                                    having 
+                                    <div ng-repeat="f in a.statistic[0].datasetSpecification.filters">
+                                        <div ng-if="f['@type'] === 'ValuationFilter'">
+                                            <div ng-repeat="vv in f.variableValuations">
+                                                <select ng-model="vv.variable.name">
+                                                    <option ng-repeat="va in model.design.variables.variable" value="{{va.name}}">{{va.name}}</option>
+                                                </select> = 
+                                                <div ng-if="vv.variable.domain['@type'] === 'ExtensionDomain'">
+                                                    <select ng-model="vv.level.value">
+                                                        <option ng-repeat="l in vv.variable.domain.levels" value="{{l.value}}">{{l.value}}</option>
+                                                    </select>
+                                                </div>
+                                                <div ng-if="vv.variable.domain['@type'] !== 'ExtensionDomain'">
+                                                    <input ng-model="vv.level.value">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <a href="" ng-click="removeAnalysis(analysisGroup.id, a)">
+                                    <span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:brown;"></span>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <a href="" ng-click="addAnalysis(analysisGroup.id)">
+                                    <span class="glyphicon glyphicon-plus" aria-hidden="true" style="color:#9e9e9e;margin-right:10px;"></span>
+                                </a>
+                            </td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </table>
+                </fieldset>
+            </div>
+        </section>
+        <section id="Configuration" class="tab-pane fade">
+            <h2>
+                <a href="" ng-click="addConfiguration()">
+                    <span class="glyphicon glyphicon-plus" aria-hidden="true" style="color:#9e9e9e;margin-right:10px;">
+                    </span>
+                </a>
+                Conduction
+            </h2>
+            <div ng-repeat="c in model.configurations">
+                <h3><input ng-model="c.id"></h3>
+                <h4>
+                    <a href="" ng-click="addRun(c.id)">
+                        <span class="glyphicon glyphicon-plus" aria-hidden="true" style="color:#9e9e9e;margin-right:10px;">
+                        </span>
+                    </a>
+                    Runs:
+                </h4>
+                <div ng-repeat="r in c.executions">
+                    <h5><input ng-model="r.id"></h5>
+                    Start:
+                    <div class="input-group">
+                        <input id="{{r.id}}-start" ng-model="r.start" type="datetime-local" placeholder="yyyy-MM-ddTHH:mm:ss" >
+
+                    </div>
+                    Finish:
+                    <div class="input-group">
+                        <input id="{{r.id}}-finish" ng-model="r.finish" type="datetime-local" placeholder="yyyy-MM-ddTHH:mm:ss" >
+                    </div>
+                    <h6>
+                        <a href="" ng-click="addResult(c.id,r.id)">
+                            <span class="glyphicon glyphicon-plus" aria-hidden="true" style="color:#9e9e9e;margin-right:10px;">
+                            </span>
+                        </a>
+                        Results:
+                    </h6>
+                    <ul>
+                        <li ng-repeat="f in r.results">
+                            File: <input ng-model="f.file.name">
+                        </li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </section>
+        </div>
+    </form>
+</div>
+
+<style>
+.table-striped > tbody > tr:nth-child(2n+1) > td, .table-striped > tbody > tr:nth-child(2n+1) > th {
+   background-color: "#DBF0F7";
+}
+</style>

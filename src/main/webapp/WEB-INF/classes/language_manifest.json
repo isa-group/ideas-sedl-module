@@ -13,15 +13,11 @@
                 "checkLanguage": "true"
         },
         {
-        "format": "xml",
-                "editorModeId": "ace/mode/xml",
-                "_editorModeURI": "mode-xml.js",
-                "checkLanguage": "false"
-        },
-        {
         "format": "json",
                 "editorModeId": "ace/mode/json",
                 "_editorModeURI": "mode-json.js",
+                "editorThemeId": "ace/theme/at",
+                "_editorThemeURI": "theme-at.js",
                 "checkLanguage": "false"
         }
         ],
