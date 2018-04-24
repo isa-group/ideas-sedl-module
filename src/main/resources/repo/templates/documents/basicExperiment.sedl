@@ -9,6 +9,8 @@
    #========================================#
 */
 EXPERIMENT:myExperiment version:1.0
+Subjects:
+   You (your@email.com) from 'Your Organization' as Resposible
 Constants:
    PI : 3.14159
 Variables:

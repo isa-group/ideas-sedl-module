@@ -2,6 +2,33 @@ $scope.loading = false;
 
 /* CONTEXT*/
 
+/* People */
+$scope.addPeople = function(){
+    console.info("Adding a new person");
+    var person=JSON.parse('{"notes": [],"annotations": [],"id": null,"phone": [],"name": "Write a real name here!","address": null, "email": "specify.a.valid@email.com","role": "Responsible","organization": "Organization of the person"}');
+    $scope.model.context.people.person.push(person);
+}
+
+$scope.removePeople = function (email){
+    console.info("Removing the person with email:"+email);
+    var index=$scope.findPeopleByEmail(email);
+    if(index!=-1){
+         $scope.model.context.people.person.splice(index, 1);
+    }else
+        console.log("Unable to find the person with email:"+email);
+}
+
+$scope.findPeopleByEmail=function (email){
+    console.info("Searching for a researcher having email:"+email);
+    var index=-1;
+    for (var i = 0; i <  $scope.model.context.people.person.length; i++) {
+        if ( $scope.model.context.people.person[i].email === email) {
+            index=i;
+        }
+    }
+    return index;
+}
+
 /* VARIABLES */
 
 $scope.removeLevelFromVariable = function (vname,value) {
@@ -262,3 +289,77 @@ $scope.removeAnalysis = function (analysisGroupId,a){
         console.info("Unable to find analysis in analysis group: "+analysisGroupId);
     }
 }
+
+/* CONFIGURATIONS */
+$scope.findConfigurationIndex=function (configId){
+    console.info("Searching for configuration with id:'"+configId+"'");
+    var index = -1;
+    for (var i = 0; i < $scope.model.configurations.length; i++) {
+        if (configId===$scope.model.configurations[i].id) {
+            index = i;
+        }
+    }
+    return index;
+}
+
+
+/* RUNS */
+
+$scope.addResult= function (configId,runId) {
+    console.info("Adding a results file to the configuration '"+configId+"' and run '"+runId+"'");
+    var configIndex= $scope.findConfigurationIndex(configId);
+    if(configIndex!=-1){
+        var runIndex=$scope.findRunIndex(configIndex,runId);
+        if(runIndex!=-1){
+            var newResultsFile=JSON.parse('{"@type": "ResultsFile","variableMapping": null,"fileFormat": null,"file": {"fileformatspecification": null, "name": "change me!", "path": null } }');
+            $scope.model.configurations[configIndex].executions[runIndex].results.push(newResultsFile);
+        }else
+            console.info("Unable to find run '"+runId+"'  in configuration '"+configId+"'");
+    }else{
+        console.info("Unable to find configuration: "+configId);
+    }
+}
+
+
+$scope.removeResultFromRun = function (configId,runId,filename) {
+    console.log("Removing file '"+filename+"' from the configuration '"+configId+"' and run '"+runId+"'");
+    var configIndex= $scope.findConfigurationIndex(configId);
+    if(configIndex!=-1){
+        var runIndex=$scope.findRunIndex(configIndex,runId);
+        if(runIndex!=-1){
+            var resultIndex=$scope.findFileIndex(configIndex,runIndex,filename);
+            if(resultIndex!=-1){
+                $scope.model.configurations[configIndex].executions[runIndex].results.splice(resultIndex, 1);
+            }else
+                console.info("Unable to find file '"+filename+"' in run '"+runId+"'  of configuration '"+configId+"'");
+        }else
+            console.info("Unable to find run '"+runId+"'  in configuration '"+configId+"'");
+    }else{
+        console.info("Unable to find configuration: "+configId);
+    }
+}
+
+$scope.findRunIndex = function (configIndex,runId) {
+    console.info("Searching for run with id:'"+runId+"' in the "+(configIndex+1)+"-th configuration");
+    var index = -1;
+    for (var i = 0; i < $scope.model.configurations[configIndex].executions.length; i++) {
+        if (runId===$scope.model.configurations[configIndex].executions[i].id) {
+            index = i;
+        }
+    }
+    return index;
+}
+
+$scope.findFileIndex = function(configIndex,runIndex,filename) {
+     console.info("Searching for file with name '"+filename+"' in run the "+(runIndex+1)+"-th run of the "+(configIndex+1)+"-th configuration");
+    var index = -1;
+    for (var i = 0; i < $scope.model.configurations[configIndex].executions[runIndex].results.length; i++) {
+        if (filename===$scope.model.configurations[configIndex].executions[runIndex].results[i].file.name) {
+            index = i;
+        }
+    }
+    return index;
+}
+
+/* AUXILIARY FUNCTIONS */
+$scope.boolToStrAssignment = function(arg) { return arg ? 'Random' : 'Custom'};
