@@ -10,7 +10,7 @@
 */
 EXPERIMENT:myExperiment version:1.0
 Subjects:
-   You (your@email.com) from 'Your Organization' as Resposible
+   You (your@email.com) from 'Your Organization' as Responsible
 Constants:
    PI : 3.14159
 Variables:
