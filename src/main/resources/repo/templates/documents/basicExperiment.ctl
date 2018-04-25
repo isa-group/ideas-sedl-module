@@ -113,6 +113,53 @@ $scope.findLevelIndex = function(v,value){
     return index;
 }
 
+$scope.generateValidValuation=function(varName){
+    console.info("Generating a valid valuation for variable: "+varName);
+    var result=null;
+    var vindex=$scope.findVariableIndex(varName);
+    if(vindex!=-1){
+        result=JSON.parse('{"variable":null,"level":null}');
+        result.variable=$scope.model.design.variables.variable[vindex];
+        result.level=$scope.generateValidLevel(result.variable.domain);
+    }else
+        console.info("Unable to find variable with name:"+varName);
+    return result;
+}
+
+$scope.generateValidLevel=function(domain){
+    var result=JSON.parse('{"value":null}');
+    if(domain['@type']=="ExtensionDomain"){
+        result=domain.levels[0];
+    }else{
+        if(domain.constraint.length>0){
+            if(domain.constraint[0]['@type']=="FundamentalSetConstraint"){
+                if(domain.constraint.length>1)
+                    result.value=generateLevelOfFundamentalSet(domain.constraint[0].fundamentalSet,domain.constraint[1]);
+                else
+                    result.value=result.value=generateLevelOfFundamentalSet(domain.constraint[0].fundamentalSet,null);
+            }
+        }
+    }
+    return result;
+}
+
+$scope.generateLevelOfFundamentalSet=function(fundamentalSet,additionalConstraint){
+    var result=null;
+    if(fundamentalSet=='B'){
+        result=true;
+    }else if(fundamentalSet=='R'){
+        result=0;
+        if(additionalConstraint!=null && additionalConstraint['@type'] === 'IntervalConstraint')
+            result=additionalConstraint.min;
+    }else if(fundamentalSet=='Z'){
+        result=0;
+        if(additionalConstraint!=null && additionalConstraint['@type'] === 'IntervalConstraint')
+            result=additionalConstraint.min;
+    }else
+        console.info("Unable to generate a default value on fundamental set:"+fundamentalSet);
+    return result;
+}
+
 /* HYPOTHESES */
 
 $scope.generateHypothesisId = function (){
@@ -217,7 +264,6 @@ $scope.removeDesignParameter = function (c){
 
 $scope.findDesignParameterIndex = function(dpname){
     var index = -1;
-
     for (var i = 0; i < $scope.model.design.designParameters.length; i++) {
         if ($scope.model.design.designParameters[i].name === dpname) {
             index = i;
@@ -227,9 +273,87 @@ $scope.findDesignParameterIndex = function(dpname){
 }
 
 
+/* EXPERIMENTAL GROUPS */
 
+$scope.findValidGroupId=function(){
+    console.info("Searching for valid Group name");
+    var result="null";
+    if($scope.model.design.experimentalDesign.groups.length>0){
+        result='"'+$scope.model.design.experimentalDesign.groups[0].name+'"';
+    }
+    return result;
+}
 
+/* EXPERIMENTAL PROTOCOL */
 
+$scope.addProtocolStep = function () {
+    console.info("Adding a protocol step");
+    var defaultStep = JSON.parse('{"@type": "Measurement", "group": '+ $scope.findValidGroupId() +',"id": "'+$scope.generateNewProtocolStepId()+'","variableValuation": [],"variable": []}');
+    defaultStep.variableValuation.push($scope.generateValidValuation($scope.model.design.variables.variable[0].name));
+    $scope.model.design.experimentalDesign.experimentalProtocol.steps.push(defaultStep);
+}
+
+$scope.generateNewProtocolStepId =function (){
+    console.info("Generating new protocol step ID");
+    var candidate=null;
+    var isValid=false;
+    var i=0;
+    while(!isValid){
+        i++;
+        isValid=true;
+        candidate="S"+i;
+        for(var j=0;j<$scope.model.design.experimentalDesign.experimentalProtocol.steps.length;j++)
+            if(candidate===$scope.model.design.experimentalDesign.experimentalProtocol.steps[j].id)
+                valid=false;
+    }
+    return candidate;
+}
+
+$scope.removeProtocolStep = function(step){
+    console.info("Removing the procol step:"+step);
+    if(step.id!=null && step.id!=""){
+        $scope.removeProtocolStepById(step.id);
+    }else{
+        var index=findProtocolStepByContent(step);
+        if(index!=-1)
+        {
+            $scope.model.design.experimentalDesign.experimentalProtocol.steps.splice(index,1);
+        }else
+            console.info("Unable to remove the procol step:"+step);
+    }
+}
+
+$scope.findProtocolStepByContent=function (step){
+    console.info("Searching for protocol step having id:"+stepId);
+    var index = -1;
+    for (var i = 0; i < $scope.model.design.experimentalDesign.experimentalProtocol.steps.length; i++) {
+        if ($scope.model.design.experimentalDesign.experimentalProtocol.steps[i]['@type'] === step['@type'] && 
+            $scope.model.design.experimentalDesign.experimentalProtocol.steps[i].group==step.group && 
+            $scope.model.design.experimentalDesign.experimentalProtocol.steps[i].variableValuation == step.variableValuation) {
+            index = i;
+        }
+    }
+    return index;
+}
+
+$scope.removeProtocolStepById = function(stepId){
+    var index=$scope.findProtocolStepIndexById(stepId);
+    if(index!=-1){
+        $scope.model.design.experimentalDesign.experimentalProtocol.steps.splice(index,1);
+    }else
+        console.info("Unable to find protocol step with Id:"+stepId);
+}
+
+$scope.findProtocolStepIndexById=function(stepId){
+    console.info("Searching for protocol step having id:"+stepId);
+    var index = -1;
+    for (var i = 0; i < $scope.model.design.experimentalDesign.experimentalProtocol.steps.length; i++) {
+        if ($scope.model.design.experimentalDesign.experimentalProtocol.steps[i].id === stepId) {
+            index = i;
+        }
+    }
+    return index;
+}
 /* ANALYSES */
 
 $scope.generateNewAnalysisGroupId=function (){
@@ -302,8 +426,47 @@ $scope.findConfigurationIndex=function (configId){
     return index;
 }
 
+$scope.addConfiguration=function () {
+    console.info("Creating a default configuration");
+    var config=JSON.parse('{"notes":[ ],"annotations":[ ],"id":"Change_me","context":null,"experimentalProcedure":{"tasks":[]},"experimentalSetting":null,"experimentalInputs":null,"experimentalOutputs":{"outputDataSources":[]},"parameters":[],"executions":[]}');
+    $scope.model.configurations.push(config);
+    
+}
+
+$scope.removeConfiguration=function(configId){
+    console.info("Removing configuration with id:"+configId);
+    var index=$scope.findConfigurationIndex(configId);
+    if(index!=-1){
+        $scope.model.configurations.splice(index,1);
+    }else
+        console.info("Unable to find configuration with id:"+configId)
+}
 
 /* RUNS */
+
+$scope.addRun=function(configId){
+    var index=$scope.findConfigurationIndex(configId);
+    if(index!=-1){
+        var defaultRun=JSON.parse('{"id":"Change_me","notes":[],"annotations":[],"log": null,"results": [],"analysisResults": [],"experimentalSetting": null,"start": null,"finish": null}');
+        $scope.model.configurations[index].executions.push(defaultRun);
+    }else{
+        console.info("Unable to find configuration: "+configId);
+    }
+}
+
+$scope.removeRun=function(configId, runId){
+    console.info("Removing run '"+runId+"' from the configuration '"+configId+"'");
+    var configIndex= $scope.findConfigurationIndex(configId);
+    if(configIndex!=-1){
+        var runIndex=$scope.findRunIndex(configIndex,runId);
+        if(runIndex!=-1){
+            $scope.model.configurations[configIndex].executions.splice(runIndex,1);
+        }else
+            console.info("Unable to find run '"+runId+"'  in configuration '"+configId+"'");
+    }else{
+        console.info("Unable to find configuration: "+configId);
+    }
+}
 
 $scope.addResult= function (configId,runId) {
     console.info("Adding a results file to the configuration '"+configId+"' and run '"+runId+"'");
