@@ -155,6 +155,7 @@ public class SEDLLanguageController extends BaseLanguageController {
 		}else if (currentFormat.equals("sedl") && desiredFormat.equals("json") ) {
                     try {
                         SEDL4PeopleUnmarshaller sedl4peopleUnmarsh = new SEDL4PeopleUnmarshaller();
+                        sedl4peopleUnmarsh.setEpUnmarshaller(new SEDL4PeopleExtensionPointsUnmarshallerImplementation());
                         Experiment exp = sedl4peopleUnmarsh.fromString(content);
                         JSONMarshaller marshaller=new JSONMarshaller();
                         appResponse.setData(marshaller.asString(exp));
@@ -204,6 +205,11 @@ public class SEDLLanguageController extends BaseLanguageController {
 //		appResponse.setData(result.getView());
 //		return appResponse;
 	}
-	
+        
+        @RequestMapping(value = "/modulesLoaded", method = RequestMethod.GET)
+	@ResponseBody
+        public ModelAndView getModulesLoaded(){
+            return new ModelAndView("modulesLoaded");
+        }
 
 }

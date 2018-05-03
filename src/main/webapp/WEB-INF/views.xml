@@ -5,5 +5,5 @@
 
     <definition name="operations/outofrange" template="/view/operations/outofrange.jsp"> </definition>
     <definition name="operations/computestats" template="/view/operations/computestats.jsp"> </definition>
-    
+    <definition name="modulesLoaded" template="/view/ModulesLoaded.jsp"> </definition>
 </tiles-definitions>

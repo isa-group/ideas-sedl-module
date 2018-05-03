@@ -111,8 +111,6 @@
 
             </section>
             <section id="Variables" class="tab-pane fade">
-
-
                 <h2>
                     <a href="" ng-click="addNewVariable()">
                         <span class="glyphicon glyphicon-plus" aria-hidden="true" style="color:#9e9e9e;margin-right:10px;">
@@ -140,19 +138,23 @@
                             </select>
                         </td>
                         <td>
-                            <select ng-model="v.domain['@type']">
-                                <option value="ExtensionDomain">
+                            <div class="input-group">
+                                <select ng-model="v.domain['@type']" class="form-control" ng-change="variableDomainTypeChange(v.name)">
+                                    <option value="ExtensionDomain">
                                     One of: 
-                                </option>
-                                <option value="IntensionDomain">
+                                    </option>
+                                    <option value="IntensionDomain">
                                     Of type 
-                                </option>
-                            </select>
+                                    </option>
+                                </select>
+                                <span ng-if="v.domain['@type'] === 'ExtensionDomain'" class="input-group-addon">
+                                    <a href="" ng-click="addNewLevelToVariable(v.name)">
+                                        <span class="glyphicon glyphicon-plus" aria-hidden="true" style="color:#9e9e9e;margin-right:10px;">
+                                        </span>
+                                    </a>
+                                </span>
+                            </div>
                             <div ng-if="v.domain['@type'] === 'ExtensionDomain'">
-                                <a href="" ng-click="addNewLevelToVariable(v.name)">
-                                    <span class="glyphicon glyphicon-plus" aria-hidden="true" style="color:#9e9e9e;margin-right:10px;">
-                                    </span>
-                                </a >
                                 <ul>
                                     <li ng-repeat="l in v.domain.levels">
                                         <input ng-model="l.value" size="10">
@@ -161,8 +163,6 @@
                                         </a>
                                     </li>
                                 </ul>
-
-
                             </div>
                             <div ng-if="v.domain['@type'] === 'IntensionDomain'"> 
                                 <div ng-repeat="constraint in v.domain.constraint">
@@ -244,14 +244,39 @@
                                 <select ng-model="step.group">
                                     <option ng-repeat="g in model.design.experimentalDesign.groups" value="{{g.name}}">{{g.name}}</option>
                                 </select> 
-
-                                <div ng-repeat="assignment in step.variableValuation">
-                                    <input ng-model="assignment.variable.name"> : <input ng-model="assignment.level.value">
+                                <div ng-if="step['@type'] === 'Measurement'"></div>
+                                     of <a href="" ng-click="addVariableToProtocolStepGroup(step)">
+                                           <span class="glyphicon glyphicon-plus" aria-hidden="true" style="color:#9e9e9e;margin-right:10px;">
+                                           </span>
+                                        </a>
+                                    <ul>
+                                    <li ng-repeat="variable in step.variable">
+                                        <select ng-model="variable">
+                                            <option ng-repeat="va in model.design.variables.variable" value="{{va.name}}" ng-disabled="va['@type'] != 'Outcome'">
+                                                {{va.name}}
+                                            </option>
+                                        </select>
+                                        <a href="" ng-click="removeVariableFromProtocolStep(step.id,assignment)">
+                                            <span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:brown;"></span>
+                                        </a>
+                                    </li>
+                                    </ul>
                                 </div>
-                                <a href="" ng-click="addAssignmentToProtocolStepGroup(step)">
-                                    <span class="glyphicon glyphicon-plus" aria-hidden="true" style="color:#9e9e9e;margin-right:10px;">
-                                    </span>
-                                </a>
+                                <div ng-if="step['@type'] === 'Treatment'"></div>
+                                    setting <a href="" ng-click="addAssignmentToProtocolStepGroup(step)">
+                                                <span class="glyphicon glyphicon-plus" aria-hidden="true" style="color:#9e9e9e;margin-right:10px;">
+                                                </span>
+                                            </a>
+                                    <ul>
+                                        <li ng-repeat="assignment in step.variableValuation">
+                                            <input ng-model="assignment.variable.name"> : <input ng-model="assignment.level.value">
+                                            <a href="" ng-click="removeAssigmentFromProtocolStep(step.id,assignment)">
+                                                <span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:brown;"></span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                    
+                                </div>
                             </td>
                             <td>
                                 <a href="" ng-click="removeProtocolStep(step)">
@@ -298,7 +323,15 @@
                                             <option value="Range">Range</option>
                                         </optgroup>
                                         <option value="Ranking">Ranking</option>
+                                        <option value="ConfidenceInterval">Confidence Interval</option>
+                                        <option value="CorrelationCoefficient">Correlation Coefficient</option>
                                         <option value="NHST">Null Hypothesis Test</option>
+                                        <option value="RScript">R Script</option>
+                                        <optgroup label="Charts">
+                                            <option value="Boxplot">Box plot</option>
+                                            <option value="Histogram">Histogram</option>
+                                            <option value="ScatterPlot">Scatter plot</option>
+                                        </optgroup>
                                     </select>                                                        
                                 </td>
                                 <td>
@@ -318,6 +351,19 @@
                                         </select>
                                         <br>
                                         Alpha:<input ng-model="a.statistic[0].alpha" size="5">
+                                    </div>
+                                    <div ng-if="a.statistic[0]['@type'] === 'CorrelationCoefficient'">
+                                        Coefficient :<select ng-model="a.statistic[0].name">
+                                                <option value="Pearson">Pearson's product-moment</option>
+                                                <option value="Spearman">Spearman's rank correlation</option>
+                                                <option value="Kendall">Kendall's tau rank correlation</option>
+                                                <option value="GoodmanAndKruskal">Goodman and Kruskal's gamma </option>
+                                            </optgroup>
+                                        </select>
+                                    </div>
+                                    <div ng-if="a.statistic[0]['@type'] === 'RScript'">
+                                        File:<input ng-model="a.statistic[0].fileName">
+                                        </select>
                                     </div>
                                 </td>
                                 <td>

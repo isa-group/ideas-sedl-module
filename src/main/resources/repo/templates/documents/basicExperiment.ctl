@@ -160,6 +160,26 @@ $scope.generateLevelOfFundamentalSet=function(fundamentalSet,additionalConstrain
     return result;
 }
 
+$scope.variableDomainTypeChange=function(variableName){
+	console.info("The type of the variable "+variableName+" changed");
+        var varIndex=$scope.findVariableIndex(variableName);
+        if(varIndex!=-1){
+            var domainType=$scope.model.design.variables.variable[varIndex].domain['@type'];
+            console.info("The new domain type is "+domainType);
+            $scope.model.design.variables.variable[varIndex].domain=$scope.createDefaultDomainOfType(domainType);
+        }
+}
+
+$scope.createDefaultDomainOfType = function(domainType){
+    var result=null;
+    if(domainType==='ExtensionDomain'){
+        result=JSON.parse('{"@type":"ExtensionDomain","levels":[{"value":"V1"},{"value":"V2"}],"finite":true}');
+    }else if(domainType==='IntensionDomain'){
+        result=JSON.parse('{"@type":"IntensionDomain","levels":[],"constraint":[{"@type":"FundamentalSetConstraint","fundamentalSet":"R"}],"finite": false}');
+    }
+    return result;
+}
+
 /* HYPOTHESES */
 
 $scope.generateHypothesisId = function (){
@@ -354,6 +374,38 @@ $scope.findProtocolStepIndexById=function(stepId){
     }
     return index;
 }
+
+$scope.addAssignmentToProtocolStepGroup = function(step) {
+    console.info("Addding variable assignmet to step having id:"+step.id);
+    var index=$scope.findProtocolStepIndexById(step.id);
+    if(index!=-1){
+        $scope.model.design.experimentalDesign.experimentalProtocol.steps[index].variableValuation.push($scope.generateValidValuation($scope.model.design.variables.variable[0].name));
+    }else
+        console.info("Unable to find protocol step with Id:"+step.id);
+}
+
+$scope.removeAssigmentFromProtocolStep=function(stepId,assignment){
+    console.info("Removing variable assígnment form step having id:"+stepId);
+    var index=$scope.findProtocolStepIndexById(stepId);
+    if(index!=-1){
+        var assignmentIndex=$scope.findAssignmentIndex(index,assignment);
+        if(assignmentIndex!=-1){
+            $scope.model.design.experimentalDesign.experimentalProtocol.steps[stepIndex].variableValuation.splice(assignmentIndex,1);
+        }else
+            console.info("Unable to find assignment in protocol step with Id:"+stepId);
+    }else
+        console.info("Unable to find protocol step with Id:"+stepId);
+}
+
+$scope.findAssignmentIndex=function(stepIndex,assignment){
+    var result=-1;
+    for(var i=0;i < $scope.model.design.experimentalDesign.experimentalProtocol.steps[stepIndex].variableValuation.length;i++){
+        if($scope.model.design.experimentalDesign.experimentalProtocol.steps[stepIndex].variableValuation[i]==assignment)
+            result=i;
+    }
+    return result;
+}
+
 /* ANALYSES */
 
 $scope.generateNewAnalysisGroupId=function (){

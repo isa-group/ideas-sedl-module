@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Context antiJARLocking="true" path="/ideas-sedl-language">
+    <!-- Configuration for Tomcat 7
+    <Loader className="org.apache.catalina.loader.VirtualWebappLoader"
+          virtualClasspath="${sedl.modules.repository.path}/*.jar"/> -->
+    <!-- Configuration for Tomcat 8 -->
+     <Resources className="org.apache.catalina.webresources.StandardRoot">
+        <JarResources className="org.apache.catalina.webresources.DirResourceSet"
+            base="${sedl.modules.repository.path}"            
+            webAppMount="/WEB-INF/lib" />
+    </Resources>
+
+</Context>
