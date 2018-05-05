@@ -324,7 +324,7 @@
                                         </optgroup>
                                         <option value="Ranking">Ranking</option>
                                         <option value="ConfidenceInterval">Confidence Interval</option>
-                                        <option value="CorrelationCoefficient">Correlation Coefficient</option>
+                                        <option value="CorrelationCoeficient">Correlation</option>
                                         <option value="NHST">Null Hypothesis Test</option>
                                         <option value="RScript">R Script</option>
                                         <optgroup label="Charts">
@@ -352,12 +352,11 @@
                                         <br>
                                         Alpha:<input ng-model="a.statistic[0].alpha" size="5">
                                     </div>
-                                    <div ng-if="a.statistic[0]['@type'] === 'CorrelationCoefficient'">
-                                        Coefficient :<select ng-model="a.statistic[0].name">
+                                    <div ng-if="a.statistic[0]['@type'] === 'CorrelationCoeficient'">
+                                        Coefficient:<select ng-model="a.statistic[0].name">
                                                 <option value="Pearson">Pearson's product-moment</option>
                                                 <option value="Spearman">Spearman's rank correlation</option>
                                                 <option value="Kendall">Kendall's tau rank correlation</option>
-                                                <option value="GoodmanAndKruskal">Goodman and Kruskal's gamma </option>
                                             </optgroup>
                                         </select>
                                     </div>
@@ -366,27 +365,47 @@
                                         </select>
                                     </div>
                                 </td>
-                                <td>
+                                <td class="col-lg-4 col-md-4">
+                                    <div class="dropdown show">
+                                        <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <span class="glyphicon glyphicon-plus" aria-hidden="true" style="color:#9e9e9e;margin-right:10px;"></span>
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                            <a class="dropdown-item btn btn-secondary" href="#" role="button" ng-click="addProjection(analysisGroup.id,a)">of ...</a>
+                                            <div class="dropdown-divider"></div>
+                                            <a class="dropdown-item  btn btn-secondary" href="#" role="button" ng-click="addGrouping(analysisGroup.id,a)">by ...</a>
+                                            <div class="dropdown-divider"></div>
+                                            <a class="dropdown-item  btn btn-secondary" href="#" role="button" ng-click="addFilter(analysisGroup.id,a)">having ...</a>
+                                        </div>
+                                    </div>
                                     <div ng-repeat="p in a.statistic[0].datasetSpecification.projections">
                                         <div ng-if="p['@type'] === 'Projection'">
-                                            of <div ng-repeat="v in p.projectedVairables">
-                                                <select ng-model="v">
-                                                    <option ng-repeat="va in model.design.variables.variable" value="{{va.name}}">{{va.name}}</option>
-                                                </select>,
-                                            </div>
+                                            of <div ng-repeat="v in p.projectedVariables">
+                                                    <select ng-model="v">
+                                                        <option ng-repeat="variable in model.design.variables.variable" value="{{variable.name}}">{{variable.name}}</option>
+                                                    </select>
+                                                    <a href="" ng-click="removeProjection(analysisGroup.id, a, p, v)">
+                                                        <span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:brown;"></span>
+                                                    </a>
+                                                </div>
                                             <br>
                                         </div>
                                     </div>
 
-                                    <div ng-repeat="g in a.statistic[0].datasetSpecification.groupings">
-                                        by
-                                        <div ng-repeat="v in g.projectedVariables">
-                                            <select ng-model="v">
+                                    <div ng-repeat="g in a.statistic[0].datasetSpecification.projections">
+                                        <div ng-if="g['@type'] === 'GroupingProjection'">
+                                            by
+                                            <div ng-repeat="v in g.projectedVariables">
+                                                <select ng-model="v">
                                                 <option ng-repeat="variable in model.design.variables.variable" value="{{variable.name}}">{{variable.name}}</option>
-                                            </select>
+                                                </select>
+                                                <a href="" ng-click="removeGrouping(analysisGroup.id, a,g, v)">
+                                                        <span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:brown;"></span>
+                                                </a>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div ng-if="a.statistic[0].datasetSpecification.filters.length !== 0"><br>
+                                    <div ng-if="a.statistic[0].datasetSpecification.filters.length != 0"><br>
                                         having 
                                         <div ng-repeat="f in a.statistic[0].datasetSpecification.filters">
                                             <div ng-if="f['@type'] === 'ValuationFilter'">
@@ -402,10 +421,14 @@
                                                     <div ng-if="vv.variable.domain['@type'] !== 'ExtensionDomain'">
                                                         <input ng-model="vv.level.value">
                                                     </div>
+                                                    <a href="" ng-click="removeFilter(analysisGroup.id, a, vv)">
+                                                        <span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:brown;"></span>
+                                                    </a>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
+                                    
                                 </td>
                                 <td>
                                     <a href="" ng-click="removeAnalysis(analysisGroup.id, a)">
@@ -490,13 +513,14 @@
                             </div>
                             Log:
                             <textarea ng-model="r.log" class="form-control col-lg-4 col-md-4" col-sm-6 id="executionLog"></textarea>
-                            <h6>
+                            <div>
+                            <h5>
                                 <a href="" ng-click="addResult(c.id, r.id)">
                                     <span class="glyphicon glyphicon-plus" aria-hidden="true" style="color:#9e9e9e;margin-right:10px;">
                                     </span>
                                 </a>
-                                Results:
-                            </h6>
+                                Raw data results:
+                            </h5>
                             <ul>
                                 <li ng-repeat="f in r.results">
                                     File: <input ng-model="f.file.name" required> 
@@ -505,17 +529,24 @@
                                     </a>
                                 </li>
 
-                            </ul>                        
+                            </ul>
+                            <br>
+                            <a href="" ng-click="generateRawDataTemplate(c.id, r.id)" class="btn btn-lg btn-primary"> 
+                                <span class="glyphicon glyphicon-flash" aria-hidden="true"></span> 
+                                Generate template for raw data collection
+                            </a>
+                            </div>
                     </div>
                 </div>
             </section>
-        </div>
+        
     </form>
 </div>
 
 <style>
-    .table-striped > tbody > tr:nth-child(2n+1) > td, .table-striped > tbody > tr:nth-child(2n+1) > th {
-        background-color: "#DBF0F7";
+<br>
+   .table-striped > tbody > tr:nth-child(odd) > td, .table-striped > tbody > tr:nth-child(odd) > th {
+        background-color: #DFDFDF;
     }
 
     input.ng-invalid.ng-touched {

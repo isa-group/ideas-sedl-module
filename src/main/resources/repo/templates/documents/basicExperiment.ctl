@@ -5,7 +5,7 @@ $scope.loading = false;
 /* People */
 $scope.addPeople = function(){
     console.info("Adding a new person");
-    var person=JSON.parse('{"notes": [],"annotations": [],"id": null,"phone": [],"name": "Write a real name here!","address": null, "email": "specify.a.valid@email.com","role": "Responsible","organization": "Organization of the person"}');
+    var person=JSON.parse('{"notes": [],"annotations": [],"id": null,"phone": [],"name": "Write a name here","address": null, "email": "specify.a.valid@email.com","role": "Responsible","organization": "Organization of the person"}');
     $scope.model.context.people.person.push(person);
 }
 
@@ -466,6 +466,224 @@ $scope.removeAnalysis = function (analysisGroupId,a){
     }
 }
 
+$scope.findAnalysisIndex=function(analysisGroupIndex,a){
+    var index=-1;
+    for(var i=0;i<$scope.model.design.experimentalDesign.intendedAnalyses[analysisGroupIndex].analyses.length;i++){
+        if(a===$scope.model.design.experimentalDesign.intendedAnalyses[analysisGroupIndex].analyses[i])
+            index=i;
+    }
+    return index;
+}
+
+$scope.addProjection = function (analysisGroupId,a){
+  console.info("Adding new projection to analysis in analysis group '"+analysisGroupId+"'");
+  var index=$scope.findAnalysisGroupIndex(analysisGroupId);
+  if(index!=-1){
+    var analysisIndex=$scope.findAnalysisIndex(index,a);
+    if(analysisIndex!=-1){
+        var projectionIndex=$scope.findProjectionIndexByType(index,analysisIndex,"Projection");
+        var variable=$scope.findDependentVariable();
+        if(variable==null)
+            variable=$scope.findIndependentVariable();
+        if(variable==null){
+            window.alert("You need to define at leas one variable!");
+            return;
+        }
+        if(projectionIndex==-1){
+            var newProjection=JSON.parse('{"@type":"Projection","projectedVariables":["'+variable.name+'"]}');
+            $scope.model.design.experimentalDesign.intendedAnalyses[index].analyses[analysisIndex].statistic[0].datasetSpecification.projections.push(newProjection);
+        }else
+            $scope.model.design.experimentalDesign.intendedAnalyses[index].analyses[analysisIndex].statistic[0].datasetSpecification.projections[projectionIndex].projectedVariables.push(variable.name);
+    }else{
+        console.info("Unable to find analysis in analysis group: "+analysisGroupId);
+    }
+  }else{
+      console.info("Unable to find analysis group: "+analysisGroupId);
+  }
+}
+
+$scope.addGrouping = function (analysisGroupId,a){
+  console.info("Adding new projection to analysis in analysis group '"+analysisGroupId+"'");
+  var index=$scope.findAnalysisGroupIndex(analysisGroupId);
+  if(index!=-1){
+    var analysisIndex=$scope.findAnalysisIndex(index,a);
+    if(analysisIndex!=-1){
+        var projectionIndex=$scope.findProjectionIndexByType(index,analysisIndex,"GroupingProjection");
+        var variable=$scope.findIndependentVariable(); 
+        if(variable==null)
+            variable=$scope.findDependentVariable();
+        if(variable==null){
+            window.alert("You need to define at leas one variable!");
+            return;
+        }
+        if(projectionIndex==-1){
+            var newProjection=JSON.parse('{"@type":"GroupingProjection","projectedVariables":["'+variable.name+'"]}');
+            $scope.model.design.experimentalDesign.intendedAnalyses[index].analyses[analysisIndex].statistic[0].datasetSpecification.projections.push(newProjection);
+        }else
+            $scope.model.design.experimentalDesign.intendedAnalyses[index].analyses[analysisIndex].statistic[0].datasetSpecification.projections[projectionIndex].projectedVariables.push(variable.name);    
+    }else{
+        console.info("Unable to find analysis in analysis group: "+analysisGroupId);
+    }
+  }else{
+      console.info("Unable to find analysis group: "+analysisGroupId);
+  }
+}
+
+$scope.addFilter = function (analysisGroupId,a){
+  console.info("Adding new filter to analysis in analysis group '"+analysisGroupId+"'");
+  var index=$scope.findAnalysisGroupIndex(analysisGroupId);
+  if(index!=-1){
+    var analysisIndex=$scope.findAnalysisIndex(index,a);
+    if(analysisIndex!=-1){
+        var variable=$scope.findIndependentVariable();
+        if(variable==null)
+            variable=$scope.findDependentVariable();
+        if(variable==null){
+            window.alert("You need to define at leas one variable!");
+            return;
+        }
+        
+        if($scope.model.design.experimentalDesign.intendedAnalyses[index].analyses[analysisIndex].statistic[0].datasetSpecification.filters.length==0){
+            var level=$scope.generateValidLevel(variable.domain);
+            var newFilter=JSON.parse('{"@type":"ValuationFilter","variableValuations":[{"variable":null,"level":{"value":'+level+'}}]}');
+            newFilter.variableValuations[0].variable=variable;
+            $scope.model.design.experimentalDesign.intendedAnalyses[index].analyses[analysisIndex].statistic[0].datasetSpecification.filters.push(newProjection);
+        }else{
+            $scope.model.design.experimentalDesign.intendedAnalyses[index].analyses[analysisIndex].statistic[0].datasetSpecification.filters.variableValuations.push($scope.generateValidValuation(variable.name));
+        }
+    }else{
+        console.info("Unable to find analysis in analysis group: "+analysisGroupId);
+    }
+  }else{
+      console.info("Unable to find analysis group: "+analysisGroupId);
+  }
+}
+
+$scope.removeProjection = function (analysisGroupId,a,p,v){
+  console.info("Removing projection from analysis in analysis group '"+analysisGroupId+"'");
+  var index=$scope.findAnalysisGroupIndex(analysisGroupId);
+  if(index!=-1){
+    var analysisIndex=$scope.findAnalysisIndex(index,a);
+    if(analysisIndex!=-1){
+        var projectionIndex=$scope.findProjectionIndex(index,analysisIndex,p);
+        if(projectionIndex!=-1){
+            if($scope.model.design.experimentalDesign.intendedAnalyses[index].analyses[analysisIndex].statistic[0].datasetSpecification.projections[projectionIndex].projectedVariables.length==1){
+                $scope.model.design.experimentalDesign.intendedAnalyses[index].analyses[analysisIndex].statistic[0].datasetSpecification.projections.splice(projectionIndex,1);
+            }else{
+                    var vindex=-1;
+                    for(var i=0;i<$scope.model.design.experimentalDesign.intendedAnalyses[index].analyses[analysisIndex].statistic[0].datasetSpecification.projections[projectionIndex].projectedVariables.length;i++)
+                        if($scope.model.design.experimentalDesign.intendedAnalyses[index].analyses[analysisIndex].statistic[0].datasetSpecification.projections[projectionIndex].projectedVariables[i]==v)
+                            vindex=i;
+                    if(vindex!=-1){
+                        $scope.model.design.experimentalDesign.intendedAnalyses[index].analyses[analysisIndex].statistic[0].datasetSpecification.projections[projectionIndex].projectedVariables.splice(vindex,1);
+                    }else{
+                        console.info("Unable to remove variable "+v+" in projection from analysis (not found)");
+                    }
+                        
+                }
+        }else{
+            console.info("Unable to remove projection from analysis (not found)");
+        }
+    }else{
+        console.info("Unable to find analysis in analysis group: "+analysisGroupId);
+    }
+  }else{
+      console.info("Unable to find analysis group: "+analysisGroupId);
+  }
+}
+
+$scope.findProjectionIndex = function (analysisGroupIndex, analysisIndex,p){
+    var projectionIndex=-1;
+    for(var i=0;i<$scope.model.design.experimentalDesign.intendedAnalyses[analysisGroupIndex].analyses[analysisIndex].statistic[0].datasetSpecification.projections.length;i++)
+        if($scope.model.design.experimentalDesign.intendedAnalyses[analysisGroupIndex].analyses[analysisIndex].statistic[0].datasetSpecification.projections[i]===p)
+            projectionIndex=i;
+    return projectionIndex;
+}
+
+$scope.findProjectionIndexByType = function (analysisGroupIndex, analysisIndex,type){
+    var projectionIndex=-1;
+    for(var i=0;i<$scope.model.design.experimentalDesign.intendedAnalyses[analysisGroupIndex].analyses[analysisIndex].statistic[0].datasetSpecification.projections.length;i++)
+        if($scope.model.design.experimentalDesign.intendedAnalyses[analysisGroupIndex].analyses[analysisIndex].statistic[0].datasetSpecification.projections[i]["@type"]===type)
+            projectionIndex=i;
+    return projectionIndex;
+}
+
+$scope.removeGrouping = function (analysisGroupId,a,g,v){
+  console.info("Removing grouping from analysis in analysis group '"+analysisGroupId+"'");
+  var index=$scope.findAnalysisGroupIndex(analysisGroupId);
+  if(index!=-1){
+    var analysisIndex=$scope.findAnalysisIndex(index,a);
+    if(analysisIndex!=-1){
+    var projectionIndex=$scope.findProjectionIndex(index,analysisIndex,g);
+        if(projectionIndex!=-1){
+            if($scope.model.design.experimentalDesign.intendedAnalyses[index].analyses[analysisIndex].statistic[0].datasetSpecification.projections[projectionIndex].projectedVariables.length==1){
+                $scope.model.design.experimentalDesign.intendedAnalyses[index].analyses[analysisIndex].statistic[0].datasetSpecification.projections.splice(projectionIndex,1);
+            }else{
+                var vindex=-1;
+                for(var i=0;i<$scope.model.design.experimentalDesign.intendedAnalyses[index].analyses[analysisIndex].statistic[0].datasetSpecification.projections[projectionIndex].projectedVariables.length;i++)
+                    if($scope.model.design.experimentalDesign.intendedAnalyses[index].analyses[analysisIndex].statistic[0].datasetSpecification.projections[projectionIndex].projectedVariables[i]==v)
+                        vindex=i;
+                if(vindex!=-1){
+                    $scope.model.design.experimentalDesign.intendedAnalyses[index].analyses[analysisIndex].statistic[0].datasetSpecification.projections[projectionIndex].projectedVariables.splice(vindex,1);
+                }else{
+                    console.info("Unable to remove variable "+v+" in groupingprojection from analysis (not found)");
+                }
+            }
+        }else{
+            console.info("Unable to remove groupingprojection from analysis (not found)");
+        }
+    }else{
+        console.info("Unable to find analysis in analysis group: "+analysisGroupId);
+    }
+  }else{
+      console.info("Unable to find analysis group: "+analysisGroupId);
+  }
+}
+
+$scope.findGroupingProjectionIndex = function(analysisGroupIndex,analysisIndex,g){
+    var groupingIndex=-1;
+    for(var i=0;i<$scope.model.design.experimentalDesign.intendedAnalyses[analysisGroupIndex].analyses[analysisIndex].statistic[0].datasetSpecification.groupings.length;i++)
+        if($scope.model.design.experimentalDesign.intendedAnalyses[analysisGroupIndex].analyses[analysisIndex].statistic[0].datasetSpecification.groupings[i]===g)
+            groupingIndex=i;
+    return groupIndex;
+}
+
+$scope.removeFilter = function (analysisGroupId,a,f){
+  console.info("Removing filter from analysis in analysis group '"+analysisGroupId+"'");
+  var index=$scope.findAnalysisGroupIndex(analysisGroupId);
+  if(index!=-1){
+    var analysisIndex=$scope.findAnalysisIndex(index,a);
+    if(analysisIndex!=-1){
+        if($scope.model.design.experimentalDesign.intendedAnalyses[index].analyses[analysisIndex].statistic[0].datasetSpecification.filters.length==1){
+            $scope.model.design.experimentalDesign.intendedAnalyses[index].analyses[analysisIndex].statistic[0].datasetSpecification.filters=[];            
+        }else{
+            var filterIndex=$scope.findFilterIndex(index,analysisIndex,f);
+            for(var i=0;i<$scope.model.design.experimentalDesign.intendedAnalyses[index].analyses[analysisIndex].statistic[0].datasetSpecification.filters.length;i++)
+                if($scope.model.design.experimentalDesign.intendedAnalyses[index].analyses[analysisIndex].statistic[0].datasetSpecification.filters[i]===f)
+                    filterIndex=i;
+            if(filterIndex!=-1)
+                $scope.model.design.experimentalDesign.intendedAnalyses[index].analyses[analysisIndex].statistic[0].datasetSpecification.filters.splice(filternIndex,1);
+            else
+                console.info("Unable to remove filter from analysis (not found)");
+        }
+    }else{
+        console.info("Unable to find analysis in analysis group: "+analysisGroupId);
+    }
+  }else{
+      console.info("Unable to find analysis group: "+analysisGroupId);
+  }
+}
+
+$scope.findFilterIndex = function(analysisGroupIndex,analysisIndex,f)
+{
+    var filterIndex=-1;
+    for(var i=0;i<$scope.model.design.experimentalDesign.intendedAnalyses[analysisGroupIndex].analyses[analysisIndex].statistic[0].datasetSpecification.filters.length;i++)
+        if($scope.model.design.experimentalDesign.intendedAnalyses[analysisGroupIndex].analyses[analysisIndex].statistic[0].datasetSpecification.filters[i]===f)
+            filterIndex=i;
+    return filterIndex;
+}
+
+
 /* CONFIGURATIONS */
 $scope.findConfigurationIndex=function (configId){
     console.info("Searching for configuration with id:'"+configId+"'");
@@ -496,7 +714,7 @@ $scope.removeConfiguration=function(configId){
 
 /* RUNS */
 
-$scope.addRun=function(configId){
+$scope.addRun = function(configId){
     var index=$scope.findConfigurationIndex(configId);
     if(index!=-1){
         var defaultRun=JSON.parse('{"id":"Change_me","notes":[],"annotations":[],"log": null,"results": [],"analysisResults": [],"experimentalSetting": null,"start": null,"finish": null}');
@@ -506,7 +724,7 @@ $scope.addRun=function(configId){
     }
 }
 
-$scope.removeRun=function(configId, runId){
+$scope.removeRun = function(configId, runId){
     console.info("Removing run '"+runId+"' from the configuration '"+configId+"'");
     var configIndex= $scope.findConfigurationIndex(configId);
     if(configIndex!=-1){
@@ -520,7 +738,7 @@ $scope.removeRun=function(configId, runId){
     }
 }
 
-$scope.addResult= function (configId,runId) {
+$scope.addResult = function (configId,runId) {
     console.info("Adding a results file to the configuration '"+configId+"' and run '"+runId+"'");
     var configIndex= $scope.findConfigurationIndex(configId);
     if(configIndex!=-1){
@@ -577,4 +795,9 @@ $scope.findFileIndex = function(configIndex,runIndex,filename) {
 }
 
 /* AUXILIARY FUNCTIONS */
+
+$scope.generateRawDataTemplate=function(configId, runId){
+    
+}
+
 $scope.boolToStrAssignment = function(arg) { return arg ? 'Random' : 'Custom'};
