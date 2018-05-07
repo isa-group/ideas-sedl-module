@@ -18,7 +18,7 @@ $scope.removePeople = function (email){
         console.log("Unable to find the person with email:"+email);
 }
 
-$scope.findPeopleByEmail=function (email){
+$scope.findPeopleByEmail = function (email){
     console.info("Searching for a researcher having email:"+email);
     var index=-1;
     for (var i = 0; i <  $scope.model.context.people.person.length; i++) {
@@ -76,6 +76,20 @@ $scope.findDependentVariable = function (){
     return variable;
 }
 
+$scope.findDependentVariableNotIn = function (names){
+    console.info("Searching for a dependent variable ");
+    var variable=null;
+    var variables=$scope.findVariableOfType('Outcome');
+    var index=-1;
+    for(var i=0;i<variables.length;i++){
+        index=$scope.findIndexIn(variables[i].name,names)
+        if(index==-1)
+            variable=variables[i];
+    }
+    return variable;
+}
+
+
 $scope.findIndependentVariable = function (){
     console.info("Searching for an independent variable ");
     var variable=null;
@@ -86,6 +100,28 @@ $scope.findIndependentVariable = function (){
         variables=$scope.findVariableOfType('NonControllableFactor');
          if(variables.length>0)
             variable=variables[0];
+    }
+    return variable;
+}
+
+$scope.findIndependentVariableNotIn = function (names){
+    console.info("Searching for an independent variable ");
+    var variable=null;
+    var variables=$scope.findVariableOfType('ControllableFactor');
+    var index=-1;
+    if(variables.length>0){
+        for(var i=0;i<variables.length;i++){
+            index=$scope.findIndexIn(variables[i].name,names)
+            if(index==-1)
+                variable=variables[i];
+        }
+    }else{
+        variables=$scope.findVariableOfType('NonControllableFactor');
+        for(var i=0;i<variables.length;i++){
+            index=$scope.findIndexIn(variables[i].name,names)
+            if(index==-1)
+                variable=variables[i];
+        }  
     }
     return variable;
 }
@@ -118,8 +154,7 @@ $scope.generateValidValuation=function(varName){
     var result=null;
     var vindex=$scope.findVariableIndex(varName);
     if(vindex!=-1){
-        result=JSON.parse('{"variable":null,"level":null}');
-        result.variable=$scope.model.design.variables.variable[vindex];
+        result=JSON.parse('{"variable":'+JSON.stringify($scope.model.design.variables.variable[vindex])+',"level":null}');
         result.level=$scope.generateValidLevel(result.variable.domain);
     }else
         console.info("Unable to find variable with name:"+varName);
@@ -134,9 +169,9 @@ $scope.generateValidLevel=function(domain){
         if(domain.constraint.length>0){
             if(domain.constraint[0]['@type']=="FundamentalSetConstraint"){
                 if(domain.constraint.length>1)
-                    result.value=generateLevelOfFundamentalSet(domain.constraint[0].fundamentalSet,domain.constraint[1]);
+                    result.value=$scope.generateLevelOfFundamentalSet(domain.constraint[0].fundamentalSet,domain.constraint[1]);
                 else
-                    result.value=result.value=generateLevelOfFundamentalSet(domain.constraint[0].fundamentalSet,null);
+                    result.value=$scope.generateLevelOfFundamentalSet(domain.constraint[0].fundamentalSet,null);
             }
         }
     }
@@ -178,6 +213,25 @@ $scope.createDefaultDomainOfType = function(domainType){
         result=JSON.parse('{"@type":"IntensionDomain","levels":[],"constraint":[{"@type":"FundamentalSetConstraint","fundamentalSet":"R"}],"finite": false}');
     }
     return result;
+}
+
+$scope.addNewVariable = function(){
+    console.info("Adding a new variable to the experiment")
+    var result=null;
+    result=JSON.parse('{"@type":"ControllableFactor","domain":null,"kind":"NOMINAL","name":"Change_me","units":null}');
+    result.domain=$scope.createDefaultDomainOfType('ExtensionDomain');
+    $scope.model.design.variables.variable.push(result);
+    return result;
+}
+
+$scope.removeVariable = function (v){
+    console.info("Removing variable "+v.name);
+    var index=$scope.findVariableIndex(v.name);
+    if(index!=-1){
+        $scope.model.design.variables.variable.splice(index,1);    
+    }else{
+        console.info("Unable to find a variable with name "+v.name);
+    }
 }
 
 /* HYPOTHESES */
@@ -482,18 +536,26 @@ $scope.addProjection = function (analysisGroupId,a){
     var analysisIndex=$scope.findAnalysisIndex(index,a);
     if(analysisIndex!=-1){
         var projectionIndex=$scope.findProjectionIndexByType(index,analysisIndex,"Projection");
-        var variable=$scope.findDependentVariable();
-        if(variable==null)
-            variable=$scope.findIndependentVariable();
-        if(variable==null){
-            window.alert("You need to define at leas one variable!");
-            return;
-        }
         if(projectionIndex==-1){
+            var variable=$scope.findDependentVariable();
+            if(variable==null)
+                variable=$scope.findIndependentVariable();
+            if(variable==null){
+                window.alert("You need to define at least one variable!");
+                return;
+            }
             var newProjection=JSON.parse('{"@type":"Projection","projectedVariables":["'+variable.name+'"]}');
             $scope.model.design.experimentalDesign.intendedAnalyses[index].analyses[analysisIndex].statistic[0].datasetSpecification.projections.push(newProjection);
-        }else
+        }else{
+            var variable=$scope.findDependentVariableNotIn($scope.model.design.experimentalDesign.intendedAnalyses[index].analyses[analysisIndex].statistic[0].datasetSpecification.projections[projectionIndex].projectedVariables);
+            if(variable==null)
+                variable=$scope.findIndependentVariableNotIn($scope.model.design.experimentalDesign.intendedAnalyses[index].analyses[analysisIndex].statistic[0].datasetSpecification.projections[projectionIndex].projectedVariables);
+            if(variable==null){
+                window.alert("All the variables are present. You need to define at least one variable to add it!");
+                return;
+            }
             $scope.model.design.experimentalDesign.intendedAnalyses[index].analyses[analysisIndex].statistic[0].datasetSpecification.projections[projectionIndex].projectedVariables.push(variable.name);
+        }
     }else{
         console.info("Unable to find analysis in analysis group: "+analysisGroupId);
     }
@@ -509,18 +571,26 @@ $scope.addGrouping = function (analysisGroupId,a){
     var analysisIndex=$scope.findAnalysisIndex(index,a);
     if(analysisIndex!=-1){
         var projectionIndex=$scope.findProjectionIndexByType(index,analysisIndex,"GroupingProjection");
-        var variable=$scope.findIndependentVariable(); 
-        if(variable==null)
-            variable=$scope.findDependentVariable();
-        if(variable==null){
-            window.alert("You need to define at leas one variable!");
-            return;
-        }
         if(projectionIndex==-1){
+            var variable=$scope.findIndependentVariable(); 
+            if(variable==null)
+                variable=$scope.findDependentVariable();
+            if(variable==null){
+                window.alert("You need to define at least one variable!");
+                return;
+            }
             var newProjection=JSON.parse('{"@type":"GroupingProjection","projectedVariables":["'+variable.name+'"]}');
             $scope.model.design.experimentalDesign.intendedAnalyses[index].analyses[analysisIndex].statistic[0].datasetSpecification.projections.push(newProjection);
-        }else
+        }else{
+            var variable=$scope.findIndependentVariableNotIn($scope.model.design.experimentalDesign.intendedAnalyses[index].analyses[analysisIndex].statistic[0].datasetSpecification.projections[projectionIndex].projectedVariables); 
+            if(variable==null)
+                variable=$scope.findDependentVariableNotIn($scope.model.design.experimentalDesign.intendedAnalyses[index].analyses[analysisIndex].statistic[0].datasetSpecification.projections[projectionIndex].projectedVariables);
+            if(variable==null){
+                window.alert("All the variables are present. You need to define at least one variable to add it!");
+                return;
+            }
             $scope.model.design.experimentalDesign.intendedAnalyses[index].analyses[analysisIndex].statistic[0].datasetSpecification.projections[projectionIndex].projectedVariables.push(variable.name);    
+        }
     }else{
         console.info("Unable to find analysis in analysis group: "+analysisGroupId);
     }
@@ -528,6 +598,7 @@ $scope.addGrouping = function (analysisGroupId,a){
       console.info("Unable to find analysis group: "+analysisGroupId);
   }
 }
+
 
 $scope.addFilter = function (analysisGroupId,a){
   console.info("Adding new filter to analysis in analysis group '"+analysisGroupId+"'");
@@ -545,11 +616,12 @@ $scope.addFilter = function (analysisGroupId,a){
         
         if($scope.model.design.experimentalDesign.intendedAnalyses[index].analyses[analysisIndex].statistic[0].datasetSpecification.filters.length==0){
             var level=$scope.generateValidLevel(variable.domain);
-            var newFilter=JSON.parse('{"@type":"ValuationFilter","variableValuations":[{"variable":null,"level":{"value":'+level+'}}]}');
+            var newFilter=JSON.parse('{"@type":"ValuationFilter","variableValuations":[{"variable":null,"level":null}]}');
             newFilter.variableValuations[0].variable=variable;
-            $scope.model.design.experimentalDesign.intendedAnalyses[index].analyses[analysisIndex].statistic[0].datasetSpecification.filters.push(newProjection);
+            newFilter.variableValuations[0].level=level;
+            $scope.model.design.experimentalDesign.intendedAnalyses[index].analyses[analysisIndex].statistic[0].datasetSpecification.filters.push(newFilter);
         }else{
-            $scope.model.design.experimentalDesign.intendedAnalyses[index].analyses[analysisIndex].statistic[0].datasetSpecification.filters.variableValuations.push($scope.generateValidValuation(variable.name));
+            $scope.model.design.experimentalDesign.intendedAnalyses[index].analyses[analysisIndex].statistic[0].datasetSpecification.filters[0].variableValuations.push($scope.generateValidValuation(variable.name));
         }
     }else{
         console.info("Unable to find analysis in analysis group: "+analysisGroupId);
@@ -648,22 +720,23 @@ $scope.findGroupingProjectionIndex = function(analysisGroupIndex,analysisIndex,g
     return groupIndex;
 }
 
-$scope.removeFilter = function (analysisGroupId,a,f){
+$scope.removeFilter = function (analysisGroupId,a,f,v){
   console.info("Removing filter from analysis in analysis group '"+analysisGroupId+"'");
   var index=$scope.findAnalysisGroupIndex(analysisGroupId);
   if(index!=-1){
     var analysisIndex=$scope.findAnalysisIndex(index,a);
     if(analysisIndex!=-1){
-        if($scope.model.design.experimentalDesign.intendedAnalyses[index].analyses[analysisIndex].statistic[0].datasetSpecification.filters.length==1){
+        if($scope.model.design.experimentalDesign.intendedAnalyses[index].analyses[analysisIndex].statistic[0].datasetSpecification.filters.length>0 && $scope.model.design.experimentalDesign.intendedAnalyses[index].analyses[analysisIndex].statistic[0].datasetSpecification.filters[0].variableValuations.length==1){
             $scope.model.design.experimentalDesign.intendedAnalyses[index].analyses[analysisIndex].statistic[0].datasetSpecification.filters=[];            
         }else{
             var filterIndex=$scope.findFilterIndex(index,analysisIndex,f);
-            for(var i=0;i<$scope.model.design.experimentalDesign.intendedAnalyses[index].analyses[analysisIndex].statistic[0].datasetSpecification.filters.length;i++)
-                if($scope.model.design.experimentalDesign.intendedAnalyses[index].analyses[analysisIndex].statistic[0].datasetSpecification.filters[i]===f)
-                    filterIndex=i;
-            if(filterIndex!=-1)
-                $scope.model.design.experimentalDesign.intendedAnalyses[index].analyses[analysisIndex].statistic[0].datasetSpecification.filters.splice(filternIndex,1);
-            else
+            if(filterIndex!=-1){
+                var variableValuationIndex=-1;
+                for(var i=0;i<$scope.model.design.experimentalDesign.intendedAnalyses[index].analyses[analysisIndex].statistic[0].datasetSpecification.filters[filterIndex].variableValuations.length;i++)
+                    if($scope.model.design.experimentalDesign.intendedAnalyses[index].analyses[analysisIndex].statistic[0].datasetSpecification.filters[filterIndex].variableValuations[i]===v)
+                        variableValuationIndex=i;
+                $scope.model.design.experimentalDesign.intendedAnalyses[index].analyses[analysisIndex].statistic[0].datasetSpecification.filters[filterIndex].variableValuations.splice(variableValuationIndex,1);
+            }else
                 console.info("Unable to remove filter from analysis (not found)");
         }
     }else{
@@ -672,6 +745,29 @@ $scope.removeFilter = function (analysisGroupId,a,f){
   }else{
       console.info("Unable to find analysis group: "+analysisGroupId);
   }
+}
+
+$scope.variableChangeInFilterValuation = function(analysisGroupId, a, f, v){
+   var index=$scope.findAnalysisGroupIndex(analysisGroupId);
+  if(index!=-1){
+    var analysisIndex=$scope.findAnalysisIndex(index,a);
+    if(analysisIndex!=-1){
+            var filterIndex=$scope.findFilterIndex(index,analysisIndex,f);
+            if(filterIndex!=-1){
+                var variableValuationIndex=-1;
+                for(var i=0;i<$scope.model.design.experimentalDesign.intendedAnalyses[index].analyses[analysisIndex].statistic[0].datasetSpecification.filters[filterIndex].variableValuations.length;i++)
+                    if($scope.model.design.experimentalDesign.intendedAnalyses[index].analyses[analysisIndex].statistic[0].datasetSpecification.filters[filterIndex].variableValuations[i]===v)
+                        variableValuationIndex=i;
+                var newValuation=$scope.generateValidValuation(v.variable.name);
+                $scope.model.design.experimentalDesign.intendedAnalyses[index].analyses[analysisIndex].statistic[0].datasetSpecification.filters[filterIndex].variableValuations[variableValuationIndex]=newValuation;
+            }else
+                console.info("Unable to remove filter from analysis (not found)");
+    }else{
+        console.info("Unable to find analysis in analysis group: "+analysisGroupId);
+    }
+  }else{
+      console.info("Unable to find analysis group: "+analysisGroupId);
+  } 
 }
 
 $scope.findFilterIndex = function(analysisGroupIndex,analysisIndex,f)
@@ -794,10 +890,36 @@ $scope.findFileIndex = function(configIndex,runIndex,filename) {
     return index;
 }
 
+/* Generation Operations */
+
+/* Validation Operations */
+
 /* AUXILIARY FUNCTIONS */
 
-$scope.generateRawDataTemplate=function(configId, runId){
+$scope.generateRawDataTemplate = function(configId, runId){
     
+    showContentAsModal("app/modalWindows/createNewFileOfLanguage?language=csv&languageId=ideas-csv-language",
+                function () {
+                    createNewFile("ideas-csv-language", ".csv");
+                });
+}
+
+$scope.uploadRawDataFile = function(cid,rid,f){
+    showContentAsModal("app/modalWindows/uploadFile",
+                function () {
+                    
+                });
+    
+}
+
+$scope.findIndexIn = function (value, set){
+    var index = -1;
+    for (var i = 0; i < set.length; i++) {
+        if (value===set[i]) {
+            index = i;
+        }
+    }
+    return index;
 }
 
 $scope.boolToStrAssignment = function(arg) { return arg ? 'Random' : 'Custom'};

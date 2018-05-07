@@ -1,6 +1,22 @@
 <div id="sedl-wrapper">
     <form action="" name="form" id="form">
-        <h1> Experiment <input ng-model="model.id" required ng-pattern="/^[a-zA-Z]([a-zA-Z0-9]|-|_)+$/" name="ExperimentID" id="ExperimentID"></h1>
+        <h1> Experiment <input ng-model="model.id" required ng-pattern="/^[a-zA-Z]([a-zA-Z0-9]|-|_)+$/" name="ExperimentID" id="ExperimentID">
+            <div class="btn-group">
+                <button ng-click="generateStudySeed()" class="btn btn-primary"> 
+                    <span class="glyphicon glyphicon-flash" aria-hidden="true"></span> 
+                    Generate seed report
+                </button>
+                 <!--<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="caret"></span>
+                    <span class="sr-only">Toggle Dropdown</span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#">in Latex format</a></li>
+                    <li role="separator" class="divider"></li>
+                    <li><a class="dropdown-item" href="#">in Word format</a></li>
+                </ul> -->
+            </div> 
+        </h1>
         <div ng-show="form.ExperimentID.$touched">
             <span ng-show="form.ExperimentID.$error.required">You must provide and identifier for the experiment.</span>
             <span ng-show="form.ExperimentID.$error">The experiment identifier must follow the pattern: a letter, followed by a sequence of letters, numbers, or the characters '-' or '_'.</span>
@@ -217,7 +233,6 @@
                             <th>Size</th>
                             <th></th>
                         </tr>
-                        <tr>
                         <tr ng-repeat="g in model.design.experimentalDesign.groups">
                             <td><input ng-model="g.name" required ng-pattern="/^[a-zA-Z]([a-zA-Z0-9]|-|_)+$/"></td>
                             <td><input ng-model="g.sizing.value" required ng-pattern="/^\d+$/"></td>
@@ -295,7 +310,7 @@
                     </a>
                     Analyses
                 </h3>
-                <div ng-repeat="analysisGroup in model.design.experimentalDesign.intendedAnalyses">
+                <div ng-repeat="analysisGroup in model.design.experimentalDesign.intendedAnalyses" class="well">
                     <fieldset>
                         <h4><input ng-model="analysisGroup.id" required ng-pattern="/^[a-zA-Z]([a-zA-Z0-9]|-|_)+$/">
                             <a href="" ng-click="removeAnalysisGroup(analysisGroup.id)">
@@ -370,13 +385,14 @@
                                         <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                             <span class="glyphicon glyphicon-plus" aria-hidden="true" style="color:#9e9e9e;margin-right:10px;"></span>
                                         </a>
-                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                                            <a class="dropdown-item btn btn-secondary" href="#" role="button" ng-click="addProjection(analysisGroup.id,a)">of ...</a>
-                                            <div class="dropdown-divider"></div>
-                                            <a class="dropdown-item  btn btn-secondary" href="#" role="button" ng-click="addGrouping(analysisGroup.id,a)">by ...</a>
-                                            <div class="dropdown-divider"></div>
-                                            <a class="dropdown-item  btn btn-secondary" href="#" role="button" ng-click="addFilter(analysisGroup.id,a)">having ...</a>
-                                        </div>
+                                        
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item btn btn-secondary" href="#" role="button" ng-click="addProjection(analysisGroup.id,a)">of ...</a></li>
+                                            <li role="separator" class="divider"></li>
+                                            <li><a class="dropdown-item  btn btn-secondary" href="#" role="button" ng-click="addGrouping(analysisGroup.id,a)">by ...</a></li>
+                                            <li role="separator" class="divider"></li>
+                                            <li><a class="dropdown-item  btn btn-secondary" href="#" role="button" ng-click="addFilter(analysisGroup.id,a)">having ...</a></li>
+                                        </ul>
                                     </div>
                                     <div ng-repeat="p in a.statistic[0].datasetSpecification.projections">
                                         <div ng-if="p['@type'] === 'Projection'">
@@ -405,12 +421,12 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div ng-if="a.statistic[0].datasetSpecification.filters.length != 0"><br>
+                                    <div ng-if="a.statistic[0].datasetSpecification.filters.length != 0 && a.statistic[0].datasetSpecification.filters[0].variableValuations.length!=0"><br>
                                         having 
                                         <div ng-repeat="f in a.statistic[0].datasetSpecification.filters">
                                             <div ng-if="f['@type'] === 'ValuationFilter'">
                                                 <div ng-repeat="vv in f.variableValuations">
-                                                    <select ng-model="vv.variable.name">
+                                                    <select ng-model="vv.variable.name"  ng-change="variableChangeInFilterValuation(analysisGroup.id, a, f, vv)">
                                                         <option ng-repeat="va in model.design.variables.variable" value="{{va.name}}">{{va.name}}</option>
                                                     </select> = 
                                                     <div ng-if="vv.variable.domain['@type'] === 'ExtensionDomain'">
@@ -421,7 +437,7 @@
                                                     <div ng-if="vv.variable.domain['@type'] !== 'ExtensionDomain'">
                                                         <input ng-model="vv.level.value">
                                                     </div>
-                                                    <a href="" ng-click="removeFilter(analysisGroup.id, a, vv)">
+                                                    <a href="" ng-click="removeFilter(analysisGroup.id, a, f, vv)">
                                                         <span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:brown;"></span>
                                                     </a>
                                                 </div>
@@ -522,16 +538,25 @@
                                 Raw data results:
                             </h5>
                             <ul>
-                                <li ng-repeat="f in r.results">
-                                    File: <input ng-model="f.file.name" required> 
-                                    <a href="" ng-click="removeResultFromRun(c.id, r.id, f.file.name)">
+                                <li ng-repeat="f in r.results">     
+                                            File: <input ng-model="f.file.name" required> 
+                                            <a href="" ng-click="removeResultFromRun(c.id, r.id, f.file.name)">
                                         <span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:brown;"></span>
                                     </a>
+                                    <a href="" ng-click="uploadRawDataFile(c.id,r.id,f)" class="btn btn-success"> 
+                                        <span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span> 
+                                        Upload data file
+                                    </a>
+                                    <a href="" ng-click="validateRawDataFile(f.file.name)" class="btn btn-warning"> 
+                                        <span class="glyphicon glyphicon-check" aria-hidden="true"></span> 
+                                        Validate data
+                                    </a>
+                                    
                                 </li>
 
                             </ul>
                             <br>
-                            <a href="" ng-click="generateRawDataTemplate(c.id, r.id)" class="btn btn-lg btn-primary"> 
+                            <a href="" ng-click="generateRawDataTemplate(c.id, r.id)" class="btn btn-primary"> 
                                 <span class="glyphicon glyphicon-flash" aria-hidden="true"></span> 
                                 Generate template for raw data collection
                             </a>
@@ -545,7 +570,7 @@
 
 <style>
 <br>
-   .table-striped > tbody > tr:nth-child(odd) > td, .table-striped > tbody > tr:nth-child(odd) > th {
+   .table-striped > tbody > tr:nth-child(2n+1) > td, .table-striped > tbody > tr:nth-child(2n+1) > th {
         background-color: #DFDFDF;
     }
 
