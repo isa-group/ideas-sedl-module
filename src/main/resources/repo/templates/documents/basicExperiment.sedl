@@ -1,14 +1,12 @@
 import Charts
 import RScripts
-/* #========================================#
-   #    Minimal Experiment Description      #
-   #========================================#
-   # Please change this desciption and add  #
-   # as much detail about your experiment   #
-   # as you wish.                           #
-   #========================================#
-   # Created on 2014/07/23 by J. A. Parejo  #
-   #========================================#
+/*
+Minimal Experiment Description
+
+Please change this desciption and add as much detail about your experiment as you wish.
+   
+    Created on 2014/07/23 by J. A. Parejo  
+   
 */
 EXPERIMENT:myExperiment version:1.0
 Subjects:

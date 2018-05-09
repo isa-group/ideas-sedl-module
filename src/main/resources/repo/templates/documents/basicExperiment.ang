@@ -543,7 +543,7 @@
                                             <a href="" ng-click="removeResultFromRun(c.id, r.id, f.file.name)">
                                         <span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:brown;"></span>
                                     </a>
-                                    <a href="" ng-click="uploadRawDataFile(c.id,r.id,f)" class="btn btn-success"> 
+                                    <a href="" ng-click="uploadRawDataFile(c.id,r.id,f.file.name)" class="btn btn-success"> 
                                         <span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span> 
                                         Upload data file
                                     </a>

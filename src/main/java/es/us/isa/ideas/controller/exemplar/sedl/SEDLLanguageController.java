@@ -28,6 +28,7 @@ import es.us.isa.sedl.module.sedl4people.SEDL4PeopleExtensionPointsUnmarshallerI
 import es.us.isa.sedl.sedl4json.JSONMarshaller;
 import es.us.isa.sedl.sedl4json.JSONUnmarshaller;
 import es.us.isa.sedl.semantic.SEDLSemanticChecker;
+import javax.servlet.http.HttpServletRequest;
 
 
 @Controller
@@ -36,7 +37,7 @@ public class SEDLLanguageController extends BaseLanguageController {
 
 	@RequestMapping(value = "/operation/{id}/execute", method = RequestMethod.POST)
 	@ResponseBody
-	public AppResponse executeOperation(String id, String content, String fileUri, String auxArg0) {
+	public AppResponse executeOperation(String id, String content, String fileUri, String auxArg0,HttpServletRequest req) {
 		
 		AppResponse response;
 		AnalyserDelegate analiser = new AnalyserDelegate();
@@ -55,8 +56,10 @@ public class SEDLLanguageController extends BaseLanguageController {
 			response = analiser.outOfRangeCSV(content, fileUri, auxArg0);
 		else if (id.equals(AnalyserDelegate.COMPUTE_STATS))
 			response = analiser.computeStats(content, fileUri);
-		else if (id.equals(AnalyserDelegate.COMPUTE_STATS_CALC)){
+		else if (id.equals(AnalyserDelegate.COMPUTE_STATS_CALC))
 			response = analiser.computeStatsCalc(content, fileUri, auxArg0);
+                else if (id.equals(AnalyserDelegate.GENERATE_RAW_DATA_TEMPLATE)){
+			response = analiser.generateRawDataTemplatec(content, fileUri, auxArg0);
 		}else {
 			response = new AppResponse();
 			response.setMessage("No analisis operation with id " + id);
@@ -68,7 +71,7 @@ public class SEDLLanguageController extends BaseLanguageController {
 	
 	@RequestMapping(value = "/format/{format}/checkLanguage", method = RequestMethod.POST)
 	@ResponseBody
-	public AppResponse checkLanguage(String id, String content, String fileUri) {
+	public AppResponse checkLanguage(String id, String content, String fileUri,HttpServletRequest req) {
 		
 		AppResponse appResponse = new AppResponse();
 		SEDL4PeopleUnmarshaller unmarshaller = new SEDL4PeopleUnmarshaller();
@@ -107,7 +110,7 @@ public class SEDLLanguageController extends BaseLanguageController {
 
 	@RequestMapping(value = "/convert", method = RequestMethod.POST)
 	@ResponseBody
-	public AppResponse convertFormat(String currentFormat, String desiredFormat, String fileUri, String content) {
+	public AppResponse convertFormat(String currentFormat, String desiredFormat, String fileUri, String content,HttpServletRequest req) {
 		AppResponse appResponse = new AppResponse();
 		
 		if (currentFormat.equals("sedl") && desiredFormat.equals("xml")) {

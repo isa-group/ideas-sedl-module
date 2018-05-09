@@ -18,6 +18,7 @@ import es.us.isa.sedl.analysis.operations.validation.OutOfRange;
 import es.us.isa.sedl.analysis.operations.validation.SmallSampling;
 import es.us.isa.sedl.core.BasicExperiment;
 import es.us.isa.sedl.core.design.FullySpecifiedExperimentalDesign;
+import es.us.isa.sedl.core.design.Variable;
 import es.us.isa.sedl.core.execution.Execution;
 import es.us.isa.sedl.marshaller.SEDL4PeopleUnmarshaller;
 import es.us.isa.sedl.runtime.analysis.validation.ValidationError;
@@ -35,6 +36,7 @@ class AnalyserDelegate {
 	public final static String OUT_OF_RANGE_CSV = "outofrangecsv";
 	public final static String COMPUTE_STATS = "computestats";
 	public final static String COMPUTE_STATS_CALC = "computestatscalc";
+        public final static String GENERATE_RAW_DATA_TEMPLATE = "generateRawDataTemplate";
 
 	// Validations
 	public final static String SMALL_SAMPLING = "smallsampling";
@@ -291,6 +293,26 @@ class AnalyserDelegate {
 		}
 		return response;
 	}
+        
+        public AppResponse generateRawDataTemplatec(String content, String fileUri, String format){
+            AppResponse response = constructBaseResponse(fileUri);
+            String columnSeparator=";";
+            try {
+			BasicExperiment exp = getExperimentFromCode(content);
+			List errors = new ArrayList();
+                        StringBuilder message=new StringBuilder("SubjectId");
+                        for(Variable var:exp.getDesign().getVariables().getVariable()){
+                            message.append(columnSeparator);
+                            message.append(var.getName());
+                        }
+                        message.append("\n");
+                        response.setMessage(message.toString());
+            }catch(Exception e){
+                response.setMessage(e.getMessage());
+                response.setStatus(Status.ERROR);
+            }
+            return response;
+        }
 
 	// Aux methods
 	

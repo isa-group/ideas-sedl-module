@@ -36,6 +36,12 @@
                 "_remoteExecution": "true",
                 "action": "function(result) {}"
         },
+        {"id": "generateRawDataTemplate",
+                "name": "Generate raw data template",
+                "data": {},
+                "_remoteExecution": "true",
+                "action": "function(result) {}"
+        },
         {
         "id": "outofrange",
                 "name": "Out of Range",

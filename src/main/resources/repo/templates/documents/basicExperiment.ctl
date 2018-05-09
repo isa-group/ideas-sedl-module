@@ -904,11 +904,31 @@ $scope.generateRawDataTemplate = function(configId, runId){
                 });
 }
 
-$scope.uploadRawDataFile = function(cid,rid,f){
+$scope.uploadRawDataFile = function(configId,runId,f){
+    console.log("Uploading file as result in conducition "+configId+" and run "+runId);
+    fileUploadCallback = function(path) {
+        var configIndex= $scope.findConfigurationIndex(configId);
+        if(configIndex!=-1){ 
+            var runIndex=$scope.findRunIndex(configIndex,runId);
+            if(runIndex!=-1){
+                var resultIndex=$scope.findFileIndex(configIndex,runIndex,f);
+                if(resultIndex!=-1){
+                    $scope.$apply(function(){
+                        $scope.model.configurations[configIndex].executions[runIndex].results[resultIndex].file.name=path;
+                    });
+                }else
+                    console.info("Unable to find file '"+filename+"' in run '"+runId+"'  of configuration '"+configId+"'");
+            }else
+                console.info("Unable to find run '"+runId+"'  in configuration '"+configId+"'");
+        }else{
+            console.info("Unable to find configuration: "+configId);
+        }
+    };
     showContentAsModal("app/modalWindows/uploadFile",
-                function () {
-                    
-                });
+        function () {
+                fileUploadCallback=null;
+        }
+    );
     
 }
 
@@ -923,3 +943,4 @@ $scope.findIndexIn = function (value, set){
 }
 
 $scope.boolToStrAssignment = function(arg) { return arg ? 'Random' : 'Custom'};
+
