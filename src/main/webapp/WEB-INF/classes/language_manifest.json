@@ -42,6 +42,12 @@
                 "_remoteExecution": "true",
                 "action": "function(result) {}"
         },
+        {"id": "generateSeedStudy",
+                "name": "Generate seed of experiment description",
+                "data": {},
+                "_remoteExecution": "true",
+                "action": "function(result) {}"
+        },
         {
         "id": "outofrange",
                 "name": "Out of Range",

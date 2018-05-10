@@ -37,6 +37,7 @@ class AnalyserDelegate {
 	public final static String COMPUTE_STATS = "computestats";
 	public final static String COMPUTE_STATS_CALC = "computestatscalc";
         public final static String GENERATE_RAW_DATA_TEMPLATE = "generateRawDataTemplate";
+        public final static String GENERATE_SEED_STUDY = "generateSeedStudy";
 
 	// Validations
 	public final static String SMALL_SAMPLING = "smallsampling";
@@ -307,6 +308,21 @@ class AnalyserDelegate {
                         }
                         message.append("\n");
                         response.setMessage(message.toString());
+            }catch(Exception e){
+                response.setMessage(e.getMessage());
+                response.setStatus(Status.ERROR);
+            }
+            return response;
+        }
+        
+        public AppResponse generateSeedStudy(String content, String fileUri, String format){
+            AppResponse response = constructBaseResponse(fileUri);
+            String columnSeparator=";";
+            try {
+			BasicExperiment exp = getExperimentFromCode(content);
+			List errors = new ArrayList();
+                        SeedStudyGenerator studyGenerator=new SeedStudyGenerator();
+                        response.setMessage(studyGenerator.generate(exp));
             }catch(Exception e){
                 response.setMessage(e.getMessage());
                 response.setStatus(Status.ERROR);

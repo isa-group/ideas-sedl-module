@@ -896,11 +896,33 @@ $scope.findFileIndex = function(configIndex,runIndex,filename) {
 
 /* AUXILIARY FUNCTIONS */
 
-$scope.generateRawDataTemplate = function(configId, runId){
-    
-    showContentAsModal("app/modalWindows/createNewFileOfLanguage?language=csv&languageId=ideas-csv-language",
-                function () {
-                    createNewFile("ideas-csv-language", ".csv");
+$scope.generateRawDataTemplate = function(configId, runId,f){
+    CommandApi.doDocumentOperation("generateRawDataTemplate", {}, EditorManager.currentUri, function (csvheader) {
+        showContentAsModal("app/modalWindows/createNewFileOfLanguage?language=csv&languageId=ideas-csv-language",
+                    function () {
+                            createNewFile("ideas-csv-language", ".csv",function(furi){
+                                console.info("Saving on "+furi+" the content '"+csvheader.message+"'");
+                                FileApi.saveFileContents(furi, csvheader.message, function (result) {
+                                    var configIndex= $scope.findConfigurationIndex(configId);
+                                    if(configIndex!=-1){ 
+                                        var runIndex=$scope.findRunIndex(configIndex,runId);
+                                        if(runIndex!=-1){
+                                            var resultIndex=$scope.findFileIndex(configIndex,runIndex,f);
+                                            if(resultIndex!=-1){
+                                                $scope.$apply(function(){
+                                                    $scope.model.configurations[configIndex].executions[runIndex].results[resultIndex].file.name=furi;
+                                                });
+                                            }else
+                                                console.info("Unable to find file '"+filename+"' in run '"+runId+"'  of configuration '"+configId+"'");
+                                        }else
+                                            console.info("Unable to find run '"+runId+"'  in configuration '"+configId+"'");
+                                    }else{
+                                        console.info("Unable to find configuration: "+configId);
+                                    }
+                                    //EditorManager.openFile(fileUri);
+                                });
+                            });
+                        },false);
                 });
 }
 
@@ -943,4 +965,3 @@ $scope.findIndexIn = function (value, set){
 }
 
 $scope.boolToStrAssignment = function(arg) { return arg ? 'Random' : 'Custom'};
-

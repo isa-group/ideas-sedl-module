@@ -56,10 +56,12 @@ public class SEDLLanguageController extends BaseLanguageController {
 			response = analiser.outOfRangeCSV(content, fileUri, auxArg0);
 		else if (id.equals(AnalyserDelegate.COMPUTE_STATS))
 			response = analiser.computeStats(content, fileUri);
-		else if (id.equals(AnalyserDelegate.COMPUTE_STATS_CALC))
+		else if (id.equals(AnalyserDelegate.COMPUTE_STATS_CALC)){
 			response = analiser.computeStatsCalc(content, fileUri, auxArg0);
-                else if (id.equals(AnalyserDelegate.GENERATE_RAW_DATA_TEMPLATE)){
+                }else if (id.equals(AnalyserDelegate.GENERATE_RAW_DATA_TEMPLATE)){
 			response = analiser.generateRawDataTemplatec(content, fileUri, auxArg0);
+                }else if (id.equals(AnalyserDelegate.GENERATE_SEED_STUDY)){
+			response = analiser.generateSeedStudy(content, fileUri, auxArg0);
 		}else {
 			response = new AppResponse();
 			response.setMessage("No analisis operation with id " + id);
