@@ -954,10 +954,38 @@ $scope.uploadRawDataFile = function(configId,runId,f){
     
 }
 
+$scope.generateStudySeed=function(){
+    CommandApi.doDocumentOperation("generateSeedStudy", {}, EditorManager.currentUri, function (latex) {
+        showContentAsModal("app/modalWindows/createNewFileOfLanguage?language=tex&languageId=ideas-latex-language",
+                    function () {
+                            createNewFile("ideas-latex-language", ".tex",function(furi){
+                                console.info("Saving on "+furi+" the content '"+latex.message+"'");
+                                FileApi.saveFileContents(furi, latex.message, function (result) {
+                                    EditorManager.openFile(furi,function(){
+                                        var model = ModeManager.getMode("ideas-latex-language");
+                                        launchOperation(model,"compileToPDF", furi);
+                                    });
+                                    
+                                });
+                            });
+                        },false);
+                });
+}
+
 $scope.findIndexIn = function (value, set){
     var index = -1;
-    for (var i = 0; i < set.length; i++) {
+    for (var i=0;i<set.length;i++) {
         if (value===set[i]) {
+            index = i;
+        }
+    }
+    return index;
+}
+
+$scope.findIndexInForProperty = function (value, set,property){
+    var index = -1;
+    for (var i=0;i<set.length;i++) {
+        if (value===set[i][property]) {
             index = i;
         }
     }

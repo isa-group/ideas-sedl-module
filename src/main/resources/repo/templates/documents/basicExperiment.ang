@@ -543,6 +543,10 @@
                                             <a href="" ng-click="removeResultFromRun(c.id, r.id, f.file.name)">
                                         <span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:brown;"></span>
                                     </a>
+                                    <a href="" ng-click="generateRawDataTemplate(c.id, r.id,f.file.name)" class="btn btn-primary"> 
+                                        <span class="glyphicon glyphicon-flash" aria-hidden="true"></span> 
+                                        Generate template file
+                                    </a>
                                     <a href="" ng-click="uploadRawDataFile(c.id,r.id,f.file.name)" class="btn btn-success"> 
                                         <span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span> 
                                         Upload data file
@@ -555,11 +559,6 @@
                                 </li>
 
                             </ul>
-                            <br>
-                            <a href="" ng-click="generateRawDataTemplate(c.id, r.id)" class="btn btn-primary"> 
-                                <span class="glyphicon glyphicon-flash" aria-hidden="true"></span> 
-                                Generate template for raw data collection
-                            </a>
                             </div>
                     </div>
                 </div>
