@@ -11,6 +11,7 @@ import es.us.isa.sedl.core.design.Constraint;
 import es.us.isa.sedl.core.design.ControllableFactor;
 import es.us.isa.sedl.core.design.Domain;
 import es.us.isa.sedl.core.design.ExtensionDomain;
+import es.us.isa.sedl.core.design.FullySpecifiedExperimentalDesign;
 import es.us.isa.sedl.core.design.FundamentalSetConstraint;
 import es.us.isa.sedl.core.design.IntensionDomain;
 import es.us.isa.sedl.core.design.IntervalConstraint;
@@ -61,7 +62,7 @@ public class SeedStudyGenerator {
     }
 
     private String generateAppendixes(BasicExperiment exp) {
-        return generateMaterialsListing(exp);
+        return generateAcnowledgements(exp)+generateMaterialsListing(exp);
     }
 
     private String generateTitle(BasicExperiment exp) {
@@ -88,12 +89,12 @@ public class SeedStudyGenerator {
                        builder.append("  Adress: "+person.getAddress());
                 if(person.getEmail()!=null && !"".equals(person.getEmail()))
                     builder .append("  \\\\ ")
-                            .append("  E-mail: "+person.getEmail()+"\\\\ ");
+                            .append("  E-mail: "+person.getEmail());
                 builder.append("\n");
             }
             if(person.getOrganization()!=null && !"".equals(person.getOrganization()))
-                builder.append( person.getOrganization());
-            builder.append("\\\\ \n");                               
+                builder.append("\\\\ \n"+person.getOrganization());            
+            builder.append("\n");                               
         }
         builder.append("}\n");
         return builder.toString();
@@ -220,11 +221,65 @@ public class SeedStudyGenerator {
     }
 
     private String generateDesign(BasicExperiment exp) {
-        return "\\section{Design}\n";
+        return "\\section{Design}\n"+
+                generateSampling(exp)+
+                generateAssignment(exp)+                
+                generateGroups(exp)+
+                generateBlockingVariables(exp)+
+                generateProtocol(exp);
     }
+    
+    private String generateGroups(BasicExperiment exp){
+        return "\\subsection{Groups}\n";
+    }
+    
+    private String generateProtocol(BasicExperiment exp){
+        return "\\subsection{Experimental protocol}\n";
+    }
+        
 
     private String generateConduction(BasicExperiment exp) {
         return "\\section{Conduction}\n";
+    }
+
+    private String generateAcnowledgements(BasicExperiment exp) {
+        return "\\section*{Acnowledgements}\n "+
+                "The authors of this experiments are grateful to the "+
+                "\\href{http://exemplar.us.es}{EXEMPLAR} development team for "+
+                "providing such a wonderful tool.\n";
+    }
+
+    private String generateSampling(BasicExperiment exp) {
+        String result="";
+        if(exp.getDesign().getSamplingMethod()!=null){        
+            result="\\subsection{Sampling}\n";
+            result+=exp.getDesign().getSamplingMethod().getDescription();
+            result+="\n";
+        }
+        return result;
+    }
+
+    private String generateAssignment(BasicExperiment exp) {
+        String result="\\subsection{Sampling}\n";        
+        FullySpecifiedExperimentalDesign design = (FullySpecifiedExperimentalDesign)exp.getDesign().getExperimentalDesign();
+        result+="The sampling strategy was "+(design.getAssignmentMethod().isRandom()?"random.":"custom.");
+        if(design.getAssignmentMethod().getDescription()!=null && !"".equals(design.getAssignmentMethod()));
+            result+=design.getAssignmentMethod().getDescription();
+        result+="\n";
+        return result;
+    }
+
+    private String generateBlockingVariables(BasicExperiment exp) {
+        String result="";
+        FullySpecifiedExperimentalDesign design = (FullySpecifiedExperimentalDesign)exp.getDesign().getExperimentalDesign();
+        if(!design.getBlockingVariables().isEmpty()){
+            result="\\subsection{Blocking Variables}\n"+
+                    "The variables to be bloked in the design are: "+design.getBlockingVariables().get(0);
+            for(int i=1;i<design.getBlockingVariables().size();i++)
+                result+=(", "+design.getBlockingVariables().get(i));
+            result+="\n";
+        }
+        return result;
     }
     
     

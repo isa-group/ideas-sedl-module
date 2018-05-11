@@ -19,7 +19,7 @@
         </h1>
         <div ng-show="form.ExperimentID.$touched">
             <span ng-show="form.ExperimentID.$error.required">You must provide and identifier for the experiment.</span>
-            <span ng-show="form.ExperimentID.$error">The experiment identifier must follow the pattern: a letter, followed by a sequence of letters, numbers, or the characters '-' or '_'.</span>
+            <span ng-show="form.ExperimentID.$error">The experiment identifier must follow the pattern: a letter followed by a sequence of letters, numbers, or the characters '-' or '_'.</span>
         </div>
         <ul class="nav nav-tabs">
             <li class="active"><a data-toggle="tab" href="#DescriptionAndContext">Context</a></li>
@@ -51,22 +51,17 @@
                                 <option value="Collaborator">Collaborator</option>
                             </select>
                         </td>
-                        <td><a href="" ng-click="removePeople(p.email)"><span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:brown;"></span></a></td>
+                        <td><button class="btn btn-link" ng-click="removePeople(p.email)"><span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:brown;"></span></button></td>
                     </tr>
                     <tr>
-                        <td><a href="" ng-click="addPeople()">
-                                <span class="glyphicon glyphicon-plus" aria-hidden="true" style="color:#9e9e9e;margin-right:10px;"></span>
-                            </a>
+                        <td><button class="btn btn-link" ng-click="addPeople()"><span class="glyphicon glyphicon-plus" aria-hidden="true" style="color:#9e9e9e;margin-right:10px;"></span></button>
                         </td><td></td><td></td><td></td><td></td>
                     </tr>
                 </table>
             </section>
             <section id="Hypotheses" class="tab-pane fade">
                 <h2>
-                    <a href="" ng-click="addNewHypothesis()">
-                        <span class="glyphicon glyphicon-plus" aria-hidden="true" style="color:#9e9e9e;margin-right:10px;">
-                        </span>
-                    </a>
+                    <button class="btn btn-link" ng-click="addNewHypothesis()"><span class="glyphicon glyphicon-plus" aria-hidden="true" style="color:#9e9e9e;margin-right:10px;"></span></button>
                     Hypotheses:
                 </h2>
                 <table>
@@ -100,24 +95,24 @@
                                     <option ng-repeat="va in model.design.variables.variable" value="{{va.name}}" ng-disabled="va['@type'] == 'Outcome'">{{va.name}}</option>
                                 </select>
                                 <span ng-if="h.independentVariables.length > 1">
-                                    <a href="" ng-click="removeIndependentVariableFromHypothesis(h.id, v)">
+                                    <button class="btn  btn-link" ng-click="removeIndependentVariableFromHypothesis(h.id, v)">
                                         <span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:brown;"></span>
-                                    </a>
+                                    </button>
                                 </span>
                             </div>
-                            <a href="" ng-click="addNewIndependentVariableToHypothesis(h)"><span class="glyphicon glyphicon-plus" aria-hidden="true" style="color:#9e9e9e;margin-right:10px;"></span></a>
+                            <button class="btn  btn-link" ng-click="addNewIndependentVariableToHypothesis(h)"><span class="glyphicon glyphicon-plus" aria-hidden="true" style="color:#9e9e9e;margin-right:10px;"></span></button>
                         </td>
-                        <td><a href="" ng-click="removeHypothesis(h)"><span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:brown;"></span></a></td>
+                        <td><button class="btn  btn-link" ng-click="removeHypothesis(h)"><span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:brown;"></span></button></td>
                     </tr>
                 </table>
 
             </section>
             <section id="Constants" class="tab-pane fade">
                 <h2>
-                    <a href="" ng-click="addDesignParameter()">
+                    <button class="btn  btn-link" ng-click="addDesignParameter()">
                         <span class="glyphicon glyphicon-plus" aria-hidden="true" style="color:#9e9e9e;margin-right:10px;">
                         </span>
-                    </a>
+                    </button>
                     Design Parameters:</h2>
                 <ul>
                     <li ng-repeat="c in model.design.designParameters">
@@ -128,10 +123,10 @@
             </section>
             <section id="Variables" class="tab-pane fade">
                 <h2>
-                    <a href="" ng-click="addNewVariable()">
+                    <button class="btn  btn-link" ng-click="addNewVariable()">
                         <span class="glyphicon glyphicon-plus" aria-hidden="true" style="color:#9e9e9e;margin-right:10px;">
                         </span>
-                    </a>
+                    </button>
                     Variables
                 </h2>
 
@@ -143,7 +138,7 @@
                         <th>Units</th>
                         <th></th>
                     </tr>
-                    <tr ng-repeat="v in model.design.variables.variable">
+                    <tr ng-repeat="v in model.design.variables.variable track by v.name">
                         <td><input ng-model="v.name" required ng-pattern="/^[a-zA-Z]([a-zA-Z0-9]|-|_)+$/"></td>
                         <td>
                             <select ng-model="v['@type']">
@@ -164,19 +159,19 @@
                                     </option>
                                 </select>
                                 <span ng-if="v.domain['@type'] === 'ExtensionDomain'" class="input-group-addon">
-                                    <a href="" ng-click="addNewLevelToVariable(v.name)">
+                                    <button class="btn  btn-link" ng-click="addNewLevelToVariable(v.name)">
                                         <span class="glyphicon glyphicon-plus" aria-hidden="true" style="color:#9e9e9e;margin-right:10px;">
                                         </span>
-                                    </a>
+                                    </button>
                                 </span>
                             </div>
                             <div ng-if="v.domain['@type'] === 'ExtensionDomain'">
                                 <ul>
                                     <li ng-repeat="l in v.domain.levels">
                                         <input ng-model="l.value" size="10">
-                                        <a href="" ng-click="removeLevelFromVariable(v.name, l.value)">
+                                        <button class="btn  btn-link" ng-click="removeLevelFromVariable(v.name, l.value)">
                                             <span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:brown;"></span>
-                                        </a>
+                                        </button>
                                     </li>
                                 </ul>
                             </div>
@@ -196,7 +191,7 @@
                             </div>
                         </td>
                         <td><input ng-model="v.units"></td> 
-                        <td><a href="" ng-click="removeVariable(v)"><span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:brown;"></span></a></td>
+                        <td><button class="btn  btn-link" ng-click="removeVariable(v)"><span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:brown;"></span></button></td>
                     </tr> 
                 </table>
 
@@ -215,16 +210,32 @@
                     </select>
                 </h2>
                 <div id="assignment">
-                    <h3>Assignment of subject to groups: 
-                        <select ng-model="model.design.samplingMethod.random" ng-options="boolToStrAssignment(item) for item in [true, false]"></select>
+                    <h3>Random assignment of subject to groups: 
+                        <select ng-model="model.design.samplingMethod.random" ng-options="item for item in [true, false]"></select>
                     </h3>
                     <span>Description of the assignment method: <textarea ng-model="model.design.samplingMethod.description"></textarea></span>
                 </div>
+                <div id="blockingVariables">
+                    <h3>
+                        <button class="btn  btn-link" ng-click="addBlockingVariable()">
+                            <span class="glyphicon glyphicon-plus" aria-hidden="true" style="color:#9e9e9e;margin-right:10px;"></span>
+                        </button>
+                        Blocking Variables: 
+                    </h3>
+                    <ul>
+                        <li ng-repeat="blockingVar in model.design.experimentalDesign.blockingVariables">
+                            <select ng-model="model.design.experimentalDesign.blockingVariables[$index]">
+                                <option ng-repeat="candidate in model.design.variables.variable" value="{{candidate.name}}">{{candidate.name}}</option>
+                            </select>
+                        </li>
+                    </ul>
+                    
+                </div>
                 <div id="CustomDesignSpecification" ng-if="model.design.experimentalDesign['@type'] === 'FullySpecifiedExperimentalDesign'">
                     <h3>
-                        <a href="" ng-click="addGroup()">
+                        <button class="btn  btn-link" ng-click="addGroup()">
                             <span class="glyphicon glyphicon-plus" aria-hidden="true" style="color:#9e9e9e;margin-right:10px;"></span>
-                        </a>
+                        </button>
                         Gropus:
                     </h3>
                     <table class="table-striped">
@@ -236,15 +247,15 @@
                         <tr ng-repeat="g in model.design.experimentalDesign.groups">
                             <td><input ng-model="g.name" required ng-pattern="/^[a-zA-Z]([a-zA-Z0-9]|-|_)+$/"></td>
                             <td><input ng-model="g.sizing.value" required ng-pattern="/^\d+$/"></td>
-                            <td><a href="" ng-click="removeGroup(g)"><span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:brown;"></span></a></td>
+                            <td><button class="btn btn-link" ng-click="removeGroup(g.name)"><span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:brown;"></span></button></td>
                         </tr>                                        
                     </table>
 
                     <h3>
-                        <a ref="" ng-click="addProtocolStep()">
+                        <button class="btn btn-link" ng-click="addProtocolStep()">
                             <span class="glyphicon glyphicon-plus" aria-hidden="true" style="color:#9e9e9e;margin-right:10px;">
                             </span>
-                        </a>
+                        </button>
                         Protocol
                     </h3>
                     <table class="table-striped">
@@ -260,10 +271,10 @@
                                     <option ng-repeat="g in model.design.experimentalDesign.groups" value="{{g.name}}">{{g.name}}</option>
                                 </select> 
                                 <div ng-if="step['@type'] === 'Measurement'"></div>
-                                     of <a href="" ng-click="addVariableToProtocolStepGroup(step)">
+                                     of <button class="btn  btn-link" ng-click="addVariableToProtocolStepGroup(step)">
                                            <span class="glyphicon glyphicon-plus" aria-hidden="true" style="color:#9e9e9e;margin-right:10px;">
                                            </span>
-                                        </a>
+                                        </button>
                                     <ul>
                                     <li ng-repeat="variable in step.variable">
                                         <select ng-model="variable">
@@ -271,32 +282,32 @@
                                                 {{va.name}}
                                             </option>
                                         </select>
-                                        <a href="" ng-click="removeVariableFromProtocolStep(step.id,assignment)">
+                                        <button class="btn  btn-link" ng-click="removeVariableFromProtocolStep(step.id,assignment)">
                                             <span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:brown;"></span>
-                                        </a>
+                                        </button>
                                     </li>
                                     </ul>
                                 </div>
                                 <div ng-if="step['@type'] === 'Treatment'"></div>
-                                    setting <a href="" ng-click="addAssignmentToProtocolStepGroup(step)">
+                                    setting <button class="btn btn-link" ng-click="addAssignmentToProtocolStepGroup(step)">
                                                 <span class="glyphicon glyphicon-plus" aria-hidden="true" style="color:#9e9e9e;margin-right:10px;">
                                                 </span>
-                                            </a>
+                                            </button>
                                     <ul>
                                         <li ng-repeat="assignment in step.variableValuation">
                                             <input ng-model="assignment.variable.name"> : <input ng-model="assignment.level.value">
-                                            <a href="" ng-click="removeAssigmentFromProtocolStep(step.id,assignment)">
+                                            <button class="btn  btn-link" ng-click="removeAssigmentFromProtocolStep(step.id,assignment)">
                                                 <span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:brown;"></span>
-                                            </a>
+                                            </button>
                                         </li>
                                     </ul>
                                     
                                 </div>
                             </td>
                             <td>
-                                <a href="" ng-click="removeProtocolStep(step)">
+                                <button class="btn  btn-link" ng-click="removeProtocolStep(step)">
                                     <span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:brown;"></span>
-                                </a>
+                                </button>
                             </td>
                         </tr>
                     </table>
@@ -304,18 +315,18 @@
             </section>
             <section id="Analyses" class="tab-pane fade">
                 <h3>
-                    <a href="" ng-click="addAnalysisGroup()">
+                    <button class="btn btn-link" ng-click="addAnalysisGroup()">
                         <span class="glyphicon glyphicon-plus" aria-hidden="true" style="color:#9e9e9e;margin-right:10px;">
                         </span>
-                    </a>
+                    </button>
                     Analyses
                 </h3>
                 <div ng-repeat="analysisGroup in model.design.experimentalDesign.intendedAnalyses" class="well">
                     <fieldset>
                         <h4><input ng-model="analysisGroup.id" required ng-pattern="/^[a-zA-Z]([a-zA-Z0-9]|-|_)+$/">
-                            <a href="" ng-click="removeAnalysisGroup(analysisGroup.id)">
+                            <button class="btn btn-link" ng-click="removeAnalysisGroup(analysisGroup.id)">
                                 <span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:brown;"></span>
-                            </a>
+                            </button>
                         </h4>
                         <table class="table-striped">
                             <tr>
@@ -351,7 +362,7 @@
                                 </td>
                                 <td>
                                     <div ng-if="a.statistic[0]['@type'] === 'NHST'">
-                                        Test:<select ng-model="a.statistic[0].name">
+                                        <b>Test:</b><select ng-model="a.statistic[0].name">
                                             <optgroup label="Normality Tests">
                                                 <option value="Kolmogorov-Smirnov">Kolmogorov-Smirnov</option>
                                             </optgroup>
@@ -365,7 +376,19 @@
                                             </optgroup>
                                         </select>
                                         <br>
-                                        Alpha:<input ng-model="a.statistic[0].alpha" size="5">
+                                        <b>Alpha:</b><input ng-model="a.statistic[0].alpha" size="5">
+                                        <div ng-if="a.statistic[0].assumptions.length!=0">
+                                            <br>
+                                            <b>Premises:</b>
+                                            <ul>
+                                            <li ng-repeat="premise in a.statistic[0].assumptions">
+                                                <span ng-if="premise.name == 'Levene'">Homocedasticity (equality of variaces)</span>
+                                                to be tested using {{premise.name}} test at alpha={{premise.alpha}}. 
+                                                <span ng-if="premise.name == 'Kolmogorov-Smirnov'">Normality </span>
+                                                to be tested using {{premise.name}} test at alpha={{premise.alpha}}.
+                                            </li>
+                                            </ul>
+                                        </div>
                                     </div>
                                     <div ng-if="a.statistic[0]['@type'] === 'CorrelationCoeficient'">
                                         Coefficient:<select ng-model="a.statistic[0].name">
@@ -387,22 +410,22 @@
                                         </a>
                                         
                                         <ul class="dropdown-menu">
-                                            <li><a class="dropdown-item btn btn-secondary" href="#" role="button" ng-click="addProjection(analysisGroup.id,a)">of ...</a></li>
+                                            <li><button class="dropdown-item btn btn-link" role="button" ng-click="addProjection(analysisGroup.id,a)">of ...</button></li>
                                             <li role="separator" class="divider"></li>
-                                            <li><a class="dropdown-item  btn btn-secondary" href="#" role="button" ng-click="addGrouping(analysisGroup.id,a)">by ...</a></li>
+                                            <li><button class="dropdown-item  btn btn-link" role="button" ng-click="addGrouping(analysisGroup.id,a)">by ...</button></li>
                                             <li role="separator" class="divider"></li>
-                                            <li><a class="dropdown-item  btn btn-secondary" href="#" role="button" ng-click="addFilter(analysisGroup.id,a)">having ...</a></li>
+                                            <li><button class="dropdown-item  btn btn-link" role="button" ng-click="addFilter(analysisGroup.id,a)">having ...</button></li>
                                         </ul>
                                     </div>
                                     <div ng-repeat="p in a.statistic[0].datasetSpecification.projections">
                                         <div ng-if="p['@type'] === 'Projection'">
-                                            of <div ng-repeat="v in p.projectedVariables">
-                                                    <select ng-model="v">
+                                            of <div ng-repeat="v in p.projectedVariables track by $index">
+                                                    <select ng-model="p.projectedVariables[$index] ">
                                                         <option ng-repeat="variable in model.design.variables.variable" value="{{variable.name}}">{{variable.name}}</option>
                                                     </select>
-                                                    <a href="" ng-click="removeProjection(analysisGroup.id, a, p, v)">
+                                                    <button class="btn btn-link" ng-click="removeProjection(analysisGroup.id, a, p, v)">
                                                         <span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:brown;"></span>
-                                                    </a>
+                                                    </button>
                                                 </div>
                                             <br>
                                         </div>
@@ -411,13 +434,13 @@
                                     <div ng-repeat="g in a.statistic[0].datasetSpecification.projections">
                                         <div ng-if="g['@type'] === 'GroupingProjection'">
                                             by
-                                            <div ng-repeat="v in g.projectedVariables">
-                                                <select ng-model="v">
-                                                <option ng-repeat="variable in model.design.variables.variable" value="{{variable.name}}">{{variable.name}}</option>
+                                            <div ng-repeat="v in g.projectedVariables track by $index">
+                                                <select ng-model="g.projectedVariables[$index]">
+                                                    <option ng-repeat="variable in model.design.variables.variable" value="{{variable.name}}">{{variable.name}}</option>
                                                 </select>
-                                                <a href="" ng-click="removeGrouping(analysisGroup.id, a,g, v)">
+                                                <button class="btn btn-link" ng-click="removeGrouping(analysisGroup.id, a,g, v)">
                                                         <span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:brown;"></span>
-                                                </a>
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -437,9 +460,9 @@
                                                     <div ng-if="vv.variable.domain['@type'] !== 'ExtensionDomain'">
                                                         <input ng-model="vv.level.value">
                                                     </div>
-                                                    <a href="" ng-click="removeFilter(analysisGroup.id, a, f, vv)">
+                                                    <button class="btn btn-link" ng-click="removeFilter(analysisGroup.id, a, f, vv)">
                                                         <span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:brown;"></span>
-                                                    </a>
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
@@ -447,16 +470,16 @@
                                     
                                 </td>
                                 <td>
-                                    <a href="" ng-click="removeAnalysis(analysisGroup.id, a)">
+                                    <button class="btn btn-link" ng-click="removeAnalysis(analysisGroup.id, a)">
                                         <span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:brown;"></span>
-                                    </a>
+                                    </button>
                                 </td>
                             </tr>
                             <tr>
                                 <td>
-                                    <a href="" ng-click="addAnalysis(analysisGroup.id)">
+                                    <button class="btn btn-link" ng-click="addAnalysis(analysisGroup.id)">
                                         <span class="glyphicon glyphicon-plus" aria-hidden="true" style="color:#9e9e9e;margin-right:10px;"></span>
-                                    </a>
+                                    </button>
                                 </td>
                                 <td></td>
                                 <td></td>
@@ -468,33 +491,33 @@
             </section>
             <section id="Configuration" class="tab-pane fade">
                 <h2>
-                    <a href="" ng-click="addConfiguration()">
+                    <button class="btn btn-link" ng-click="addConfiguration()">
                         <span class="glyphicon glyphicon-plus" aria-hidden="true" style="color:#9e9e9e;margin-right:10px;">
                         </span>
-                    </a>
+                    </button>
                     Conduction
                 </h2>
                 <div ng-repeat="c in model.configurations">
                     <h3>
                         <input ng-model="c.id">
-                        <a href="" ng-click="removeConfiguration(c.id)">
+                        <button class="btn btn-link" ng-click="removeConfiguration(c.id)">
                             <span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:brown;"></span>
-                        </a>
+                        </button>
                     </h3>
                     <h4>
-                        <a href="" ng-click="addRun(c.id)">
+                        <button class="btn btn-link" ng-click="addRun(c.id)">
                             <span class="glyphicon glyphicon-plus" aria-hidden="true" style="color:#9e9e9e;margin-right:10px;">
                             </span>
-                        </a>
+                        </button>
                         Runs:
                     </h4>
                     <div ng-repeat="r in c.executions" class="well">                                                
                             <div class="input-group">
                                 <input ng-model="r.id" class="form-control">
                                 <span class="input-group-addon">
-                                    <a href="" ng-click="removeRun(c.id, r.id)">
+                                    <button class="btn btn-link" ng-click="removeRun(c.id, r.id)">
                                         <span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:brown;"></span>
-                                    </a>
+                                    </button>
                                 </span>
                                 <span class="input-group-addon">Start:</span>
                                 <div class="dropdown">
@@ -531,35 +554,33 @@
                             <textarea ng-model="r.log" class="form-control col-lg-4 col-md-4" col-sm-6 id="executionLog"></textarea>
                             <div>
                             <h5>
-                                <a href="" ng-click="addResult(c.id, r.id)">
+                                <button class="btn btn-link" ng-click="addResult(c.id, r.id)">
                                     <span class="glyphicon glyphicon-plus" aria-hidden="true" style="color:#9e9e9e;margin-right:10px;">
                                     </span>
-                                </a>
+                                </button>
                                 Raw data results:
                             </h5>
                             <ul>
                                 <li ng-repeat="f in r.results">     
-                                            File: <input ng-model="f.file.name" required> 
-                                            <a href="" ng-click="removeResultFromRun(c.id, r.id, f.file.name)">
+                                    File: <input ng-model="f.file.name" required> 
+                                    <button class="btn btn-link" ng-click="removeResultFromRun(c.id, r.id, f.file.name)">
                                         <span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:brown;"></span>
-                                    </a>
-                                    <a href="" ng-click="generateRawDataTemplate(c.id, r.id,f.file.name)" class="btn btn-primary"> 
+                                    </button>
+                                    <button ng-click="generateRawDataTemplate(c.id, r.id,f.file.name)" class="btn btn-primary"> 
                                         <span class="glyphicon glyphicon-flash" aria-hidden="true"></span> 
                                         Generate template file
-                                    </a>
-                                    <a href="" ng-click="uploadRawDataFile(c.id,r.id,f.file.name)" class="btn btn-success"> 
+                                    </button>
+                                    <button ng-click="uploadRawDataFile(c.id,r.id,f.file.name)" class="btn btn-success"> 
                                         <span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span> 
                                         Upload data file
-                                    </a>
-                                    <a href="" ng-click="validateRawDataFile(f.file.name)" class="btn btn-warning"> 
+                                    </button>
+                                    <button ng-click="validateRawDataFile(f.file.name)" class="btn btn-warning"> 
                                         <span class="glyphicon glyphicon-check" aria-hidden="true"></span> 
                                         Validate data
-                                    </a>
-                                    
+                                    </button>
                                 </li>
-
                             </ul>
-                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -571,6 +592,9 @@
 <br>
    .table-striped > tbody > tr:nth-child(2n+1) > td, .table-striped > tbody > tr:nth-child(2n+1) > th {
         background-color: #DFDFDF;
+    }
+    .table-striped > tbody > tr:nth-child(2n+1) > td, .table-striped > tbody > tr:nth-child(2n+1) > th {
+        background-color: #FFFFFF;
     }
 
     input.ng-invalid.ng-touched {

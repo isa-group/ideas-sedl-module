@@ -244,10 +244,10 @@ $scope.generateDummyHypothesis = function (){
     console.info("Generating a dummy hypotheis ");
     var dependentVariable=$scope.findDependentVariable();
     var independentVariable=$scope.findIndependentVariable();
-    var id=generateHypothesisId()
+    var id=$scope.generateHypothesisId()
     var result=null;
     if(dependentVariable && independentVariable)
-        result=JSON.parse('{"@type" : "DifferentialHypothesis",    "notes" : [ ],    "annotations" : [ ],    "id" : null,    "dependentVariable" : "'+dependentVariable.name+'",    "independentVariables" : [ "'+independentVariable.name+'" ]}');
+        result=JSON.parse('{"@type" : "DifferentialHypothesis",    "notes" : [ ],    "annotations" : [ ],    "id" :'+id+',    "dependentVariable" : "'+dependentVariable.name+'",    "independentVariables" : [ "'+independentVariable.name+'" ]}');
     else
         result=JSON.parse('{"@type" : "DescriptiveHypothesis","notes" : ["Write your descriptoin here"]}');
     return result;
@@ -255,7 +255,7 @@ $scope.generateDummyHypothesis = function (){
 
 
 $scope.addNewHypothesis = function (h){
-    $scope.model.hypotheses.push(generateDummyHypothesis());
+    $scope.model.hypotheses.push($scope.generateDummyHypothesis());
 }
 
 $scope.removeHypothesis = function (h){
@@ -347,7 +347,31 @@ $scope.findDesignParameterIndex = function(dpname){
 }
 
 
+/* BLOCKING VARIABLES */
+$scope.addBlokingVariable=function(){
+    console.info("Adding a new blocking variable");
+    var varName=$scope.findIndependentVariableNotIn($scope.model.design.experimentalDesign.blockingVariables);
+    if(varName!=null)
+        $scope.model.design.experimentalDesign.blockingVariables.push(varName);
+    
+}
+
 /* EXPERIMENTAL GROUPS */
+
+$scope.addGroup=function(){
+    console.info("Adding a new dummy group to the design");
+    var group=JSON.parse('{"sizing":{"@type":"Literal","value":1},"valuations":[],"name":"Change_me","groupSpecification":true}');
+    $scope.model.design.experimentalDesign.groups.push(group);
+}
+
+$scope.removeGroup=function(groupName){
+    console.info("Removing group "+groupName);
+    var groupIndex=$scope.findIndexInForProperty(groupName,$scope.model.design.experimentalDesign.groups,"name");
+    if(groupIndex!=-1){
+        $scope.model.design.experimentalDesign.groups.splice(groupIndex,1);
+    }else
+        console.info("Unable to find group "+groupName);
+}
 
 $scope.findValidGroupId=function(){
     console.info("Searching for valid Group name");
@@ -444,7 +468,7 @@ $scope.removeAssigmentFromProtocolStep=function(stepId,assignment){
     if(index!=-1){
         var assignmentIndex=$scope.findAssignmentIndex(index,assignment);
         if(assignmentIndex!=-1){
-            $scope.model.design.experimentalDesign.experimentalProtocol.steps[stepIndex].variableValuation.splice(assignmentIndex,1);
+            $scope.model.design.experimentalDesign.experimentalProtocol.steps[index].variableValuation.splice(assignmentIndex,1);
         }else
             console.info("Unable to find assignment in protocol step with Id:"+stepId);
     }else
@@ -616,9 +640,7 @@ $scope.addFilter = function (analysisGroupId,a){
         
         if($scope.model.design.experimentalDesign.intendedAnalyses[index].analyses[analysisIndex].statistic[0].datasetSpecification.filters.length==0){
             var level=$scope.generateValidLevel(variable.domain);
-            var newFilter=JSON.parse('{"@type":"ValuationFilter","variableValuations":[{"variable":null,"level":null}]}');
-            newFilter.variableValuations[0].variable=variable;
-            newFilter.variableValuations[0].level=level;
+            var newFilter=JSON.parse('{"@type":"ValuationFilter","variableValuations":[{"variable":'+JSON.stringify(variable)+',"level":'+JSON.stringify(level)+'}]}');
             $scope.model.design.experimentalDesign.intendedAnalyses[index].analyses[analysisIndex].statistic[0].datasetSpecification.filters.push(newFilter);
         }else{
             $scope.model.design.experimentalDesign.intendedAnalyses[index].analyses[analysisIndex].statistic[0].datasetSpecification.filters[0].variableValuations.push($scope.generateValidValuation(variable.name));
@@ -991,5 +1013,3 @@ $scope.findIndexInForProperty = function (value, set,property){
     }
     return index;
 }
-
-$scope.boolToStrAssignment = function(arg) { return arg ? 'Random' : 'Custom'};
