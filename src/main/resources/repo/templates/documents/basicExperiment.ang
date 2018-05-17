@@ -36,18 +36,18 @@
                         Format:
                         <select ng-model="descriptionType">
                             <option value="FreeForm">Free form</option>
-                            <option value="StructuredAbstract">Structured Abstraact</option>    
+                            <option value="StructuredAbstract">Structured Abstract</option>    
                         </select>
                         <div ng-if="descriptionType=='FreeForm'">
                             <textarea ng-model="model.notes[0]" cols="80" rows="12"> </textarea>
                         </div>
                         <div ng-if="descriptionType=='StructuredAbstract'" class="well">
                             <table>
-                            <tr><th>Context:</th><td><textarea ng-model="model.notes[0]" cols="80" rows="1"></textarea></td></tr>
-                            <tr><th>Goal:</th><td><textarea ng-model="model.notes[1]" cols="80" rows="1"></textarea></td></tr>
-                            <tr><th>Method:</th><td><textarea ng-model="model.notes[2]" cols="80" rows="1"></textarea></td></tr>
-                            <tr><th>Results:</th><td><textarea ng-model="model.notes[3]" cols="80" rows="1"></textarea></td></tr>
-                            <tr><th>Conclusions:</th><td><textarea ng-model="model.notes[4]" cols="80" rows="1"></textarea></td></tr>
+                            <tr><th>Context:</th><td><textarea ng-model="model.notes[0]" cols="80" rows="2"></textarea></td></tr>
+                            <tr><th>Goal:</th><td><textarea ng-model="model.notes[1]" cols="80" rows="2"></textarea></td></tr>
+                            <tr><th>Method:</th><td><textarea ng-model="model.notes[2]" cols="80" rows="2"></textarea></td></tr>
+                            <tr><th>Results:</th><td><textarea ng-model="model.notes[3]" cols="80" rows="2"></textarea></td></tr>
+                            <tr><th>Conclusions:</th><td><textarea ng-model="model.notes[4]" cols="80" rows="2"></textarea></td></tr>
                             </table>
                         </div>
                 </details>
@@ -63,11 +63,11 @@
                         </div>
                         <div ng-if="goalType=='GQM'" class="well">
                             <table>
-                            <tr><th>Analyze </th><td> <textarea ng-model="model.context.notes[0]" cols="80" rows="1"></textarea></td></tr>
-                            <tr><th>for the purpose of </th><td> <textarea ng-model="model.context.notes[1]" cols="80" rows="1"></textarea></td></tr>
-                            <tr><th>with respect to </th><td> <textarea ng-model="model.context.notes[2]" cols="80" rows="1"></textarea></td></tr>
-                            <tr><th>from the point of view of </th><td><textarea ng-model="model.context.notes[3]" cols="80" rows="1"></textarea></td></tr>
-                            <tr><th>in the context of </th><td><textarea ng-model="model.context.notes[4]" cols="80" rows="1"></textarea></td></tr>
+                            <tr><th>Analyze </th><td> <textarea ng-model="model.context.notes[0]" cols="80" rows="2"></textarea></td></tr>
+                            <tr><th>for the purpose of </th><td> <textarea ng-model="model.context.notes[1]" cols="80" rows="2"></textarea></td></tr>
+                            <tr><th>with respect to </th><td> <textarea ng-model="model.context.notes[2]" cols="80" rows="2"></textarea></td></tr>
+                            <tr><th>from the point of view of </th><td><textarea ng-model="model.context.notes[3]" cols="80" rows="2"></textarea></td></tr>
+                            <tr><th>in the context of </th><td><textarea ng-model="model.context.notes[4]" cols="80" rows="2"></textarea></td></tr>
                             </table>
                         </div>
                 </details>
@@ -438,7 +438,7 @@
                                         </select>
                                     </div>
                                     <div ng-if="a.statistic[0]['@type'] === 'RScript'">
-                                        File: <input ng-model="a.statistic[0].fileName" required>
+                                        File: <input ng-model="a.statistic[0].fileName" existingFile>
                                         </select>
                                     </div>
                                 </td>
@@ -602,7 +602,7 @@
                             </h5>
                             <ul>
                                 <li ng-repeat="f in r.results">     
-                                    File: <input ng-model="f.file.name" required> 
+                                    File: <input ng-model="f.file.name" existingFile> 
                                     <button class="btn btn-default" ng-click="removeResultFromRun(c.id, r.id, f.file.name)"  type="button">
                                         <span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:brown;"></span>
                                     </button>

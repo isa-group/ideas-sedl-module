@@ -1,6 +1,13 @@
+//# sourceURL=ExperimentalDescriptionController.js
 $scope.loading = false;
-$scope.descriptionType = ($scope.model.notes && $scope.model.notes.length>1)?"StructuredAbstract":"FreeForm";
-$scope.goalType = ($scope.model.context.notes && $scope.model.context.notes.length>1)?"GQM":"FreeForm";
+
+$("details").click(function(event) {
+  $scope.descriptionType = ($scope.model.notes && $scope.model.notes.length>1)?"StructuredAbstract":"FreeForm";
+  $scope.goalType = ($scope.model.context && $scope.model.context.notes.length>1)?"GQM":"FreeForm";
+  $("details").click(function(event) {});
+  $scope.$apply();
+});
+
 
 /* CONTEXT*/
 
