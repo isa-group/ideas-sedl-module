@@ -321,7 +321,7 @@ class AnalyserDelegate {
             try {
 			BasicExperiment exp = getExperimentFromCode(content);
 			List errors = new ArrayList();
-                        SeedStudyGenerator studyGenerator=new SeedStudyGenerator();
+                        LatexSeedStudyGenerator studyGenerator=new LatexSeedStudyGenerator();
                         response.setMessage(studyGenerator.generate(exp));
             }catch(Exception e){
                 response.setMessage(e.getMessage());
