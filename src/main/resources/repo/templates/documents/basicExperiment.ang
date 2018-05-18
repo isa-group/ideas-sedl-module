@@ -42,12 +42,12 @@
                             <textarea ng-model="model.notes[0]" cols="80" rows="12"> </textarea>
                         </div>
                         <div ng-if="descriptionType=='StructuredAbstract'" class="well">
-                            <table>
-                            <tr><th>Context:</th><td><textarea ng-model="model.notes[0]" cols="80" rows="2"></textarea></td></tr>
-                            <tr><th>Goal:</th><td><textarea ng-model="model.notes[1]" cols="80" rows="2"></textarea></td></tr>
-                            <tr><th>Method:</th><td><textarea ng-model="model.notes[2]" cols="80" rows="2"></textarea></td></tr>
-                            <tr><th>Results:</th><td><textarea ng-model="model.notes[3]" cols="80" rows="2"></textarea></td></tr>
-                            <tr><th>Conclusions:</th><td><textarea ng-model="model.notes[4]" cols="80" rows="2"></textarea></td></tr>
+                            <table style="min-width: 100%">
+                            <tr><th>Context:</th><td><textarea ng-model="model.notes[0]" cols="80" rows="3" class="form-control"></textarea></td></tr>
+                            <tr><th>Goal:</th><td><textarea ng-model="model.notes[1]" cols="80" rows="3" class="form-control"></textarea></td></tr>
+                            <tr><th>Method:</th><td><textarea ng-model="model.notes[2]" cols="80" rows="3" class="form-control"></textarea></td></tr>
+                            <tr><th>Results:</th><td><textarea ng-model="model.notes[3]" cols="80" rows="3" class="form-control"></textarea></td></tr>
+                            <tr><th>Conclusions:</th><td><textarea ng-model="model.notes[4]" cols="80" rows="3" class="form-control"></textarea></td></tr>
                             </table>
                         </div>
                 </details>
@@ -62,12 +62,12 @@
                             <textarea ng-model="model.context.notes[0]" cols="80" rows="12"> </textarea>
                         </div>
                         <div ng-if="goalType=='GQM'" class="well">
-                            <table>
-                            <tr><th>Analyze </th><td> <textarea ng-model="model.context.notes[0]" cols="80" rows="2"></textarea></td></tr>
-                            <tr><th>for the purpose of </th><td> <textarea ng-model="model.context.notes[1]" cols="80" rows="2"></textarea></td></tr>
-                            <tr><th>with respect to </th><td> <textarea ng-model="model.context.notes[2]" cols="80" rows="2"></textarea></td></tr>
-                            <tr><th>from the point of view of </th><td><textarea ng-model="model.context.notes[3]" cols="80" rows="2"></textarea></td></tr>
-                            <tr><th>in the context of </th><td><textarea ng-model="model.context.notes[4]" cols="80" rows="2"></textarea></td></tr>
+                            <table style="min-width: 100%">
+                            <tr><th>Analyze </th><td> <textarea ng-model="model.context.notes[0]" cols="80" rows="2" class="form-control"></textarea></td></tr>
+                            <tr><th>for the purpose of </th><td> <textarea ng-model="model.context.notes[1]" cols="80" rows="2" class="form-control"></textarea></td></tr>
+                            <tr><th>with respect to </th><td> <textarea ng-model="model.context.notes[2]" cols="80" rows="2" class="form-control"></textarea></td></tr>
+                            <tr><th>from the point of view of </th><td><textarea ng-model="model.context.notes[3]" cols="80" class="form-control"></textarea></td></tr>
+                            <tr><th>in the context of </th><td><textarea ng-model="model.context.notes[4]" cols="80" rows="2" class="form-control"></textarea></td></tr>
                             </table>
                         </div>
                 </details>
@@ -438,7 +438,13 @@
                                         </select>
                                     </div>
                                     <div ng-if="a.statistic[0]['@type'] === 'RScript'">
-                                        File: <input ng-model="a.statistic[0].fileName" existingFile>
+                                        <img src="js/dyntree/skin/../../../css/dyntree/skin/Rlogo.png" alt=""> File: <input ng-model="a.statistic[0].fileName" existingfile>
+                                        <span>
+                                            <button type="button" class="btn btn-primary" ng-click="runRScript(a.statistic[0].fileName);">
+                                                <span class="glyphicon glyphicon-play"></span>
+                                                Run
+                                            </button>
+                                        </span>
                                         </select>
                                     </div>
                                 </td>
@@ -602,7 +608,7 @@
                             </h5>
                             <ul>
                                 <li ng-repeat="f in r.results">     
-                                    File: <input ng-model="f.file.name" existingFile> 
+                                    File: <input ng-model="f.file.name" existingfile> 
                                     <button class="btn btn-default" ng-click="removeResultFromRun(c.id, r.id, f.file.name)"  type="button">
                                         <span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:brown;"></span>
                                     </button>
@@ -630,7 +636,7 @@
 
 <style>
 
-    input.ng-invalid.ng-touched {
+    input.ng-invalid {
         background-color: #FA787E;
     }
 

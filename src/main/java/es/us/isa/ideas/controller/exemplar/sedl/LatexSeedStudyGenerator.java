@@ -252,13 +252,13 @@ public class LatexSeedStudyGenerator {
             }
             result += "\\textit{" + h.getIndependentVariables().get(i) + "}";
         }
-        result+="; and the \\textit{alternative hypothesis} ${" + h.getId() + "}_0$: \\neg{H_{0,2}}$,"
+        result+="; and the \\textit{alternative hypothesis} ${" + h.getId() + "}_0$: $\\neg{H_{0,2}}$,"
                 + " that states that such a difference in the means exists and it is not due to chance.";
         return result;
     }
 
     private String generateParameters(BasicExperiment exp) {
-        return "\\section{Parameters}\n\\label{sec:parameters}\n";
+        return "\\section{Design Parameters}\n\\label{sec:parameters}\n";
     }
 
     private String generateVariables(BasicExperiment exp) {

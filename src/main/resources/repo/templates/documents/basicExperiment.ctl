@@ -4,7 +4,7 @@ $scope.loading = false;
 $("details").click(function(event) {
   $scope.descriptionType = ($scope.model.notes && $scope.model.notes.length>1)?"StructuredAbstract":"FreeForm";
   $scope.goalType = ($scope.model.context && $scope.model.context.notes.length>1)?"GQM":"FreeForm";
-  $("details").click(function(event) {});
+  $("details").off("click");
   $scope.$apply();
 });
 
@@ -1046,4 +1046,9 @@ $scope.findIndexInForProperty = function (value, set,property){
         }
     }
     return index;
+}
+
+$scope.runRScript=function(file){
+    fileUriOperation=selectedWorkspace+'/'+file;
+    launchOperation('ideas-R-language','executeScript',fileUriOperation);
 }
