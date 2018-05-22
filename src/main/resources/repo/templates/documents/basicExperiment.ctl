@@ -563,6 +563,17 @@ $scope.findAnalysisGroupIndex = function (analysisGroupId){
     return indexToAdd;
 }
 
+$scope.removeAnalysisGroup = function (analysisGroupId){
+    console.info("Removing an analysis to the group "+analysisGroupId);
+    var index = $scope.findAnalysisGroupIndex(analysisGroupId);
+    if(index!=-1){
+      $scope.model.design.experimentalDesign.intendedAnalyses.splice(index,1);
+    }else
+      console.log("Unable to find analysis group "+analysisGroupId);
+
+}
+
+
 $scope.removeAnalysis = function (analysisGroupId,a){
     console.info("Removing an analysis to the group "+analysisGroupId);
     var index = $scope.findAnalysisGroupIndex(analysisGroupId);

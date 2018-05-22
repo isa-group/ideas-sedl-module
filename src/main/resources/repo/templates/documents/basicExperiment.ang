@@ -74,14 +74,21 @@
                 <h4>Experimenters:</h4>
                 <table class="table table-striped table-bordered">
                     <tr>
-                        <th>Name</th>
+                        <th></th>
+                        <th>Name & Details</th>
                         <th>Email</th>
                         <th>Organization</th>
                         <th>Role</th>
                         <th></th>
                     </tr>
                     <tr ng-repeat="p in model.context.people.person">
-                        <td><input ng-model="p.name"  size="25" required/></td>
+                        <td><gravatar email="p.email"/></td>
+                        <td><input ng-model="p.name"  size="30" required/>
+                            <details>
+                            <summary>Tasks in this experiment:</summary>
+                            <textarea ng-model="p.notes[0]" cols="30" rows="5" class="form-control"></textarea>
+                            </details>
+                        </td>
                         <td><input ng-model="p.email" size="20" required/></td>
                         <td><input ng-model="p.organization" size="25"/></td>
                         <td><select ng-model="p.role">
