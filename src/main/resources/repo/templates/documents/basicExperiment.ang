@@ -19,7 +19,7 @@
         </h1>
         <div ng-show="form.ExperimentID.$touched">
             <span ng-show="form.ExperimentID.$error.required">You must provide and identifier for the experiment.</span>
-            <span ng-show="form.ExperimentID.$error">The experiment identifier must follow the pattern: a letter followed by a sequence of letters, numbers, or the characters '-' or '_'.</span>
+            <span ng-show="!form.ExperimentID.$valid">The experiment identifier must follow the pattern: a letter followed by a sequence of letters, numbers, or the characters '-' or '_'.</span>
         </div>
         <ul class="nav nav-tabs">
             <li class="active"><a data-toggle="tab" href="#DescriptionAndContext">Context</a></li>
@@ -207,12 +207,12 @@
                                 <ul>
                                     <li ng-repeat="l in v.domain.levels">
                                         <input ng-model="l.value" size="10">
-                                        <span>
-                                        <label>Description:</label><textarea ng-model="l.notes[0]" rows="2" cols="40"></textarea>
-                                        </span>
-                                        <button class="btn  btn-default" ng-click="removeLevelFromVariable(v.name, l.value)"  type="button">
+                                        <button class="btn  btn-default pull-right" ng-click="removeLevelFromVariable(v.name, l.value)"  type="button">
                                             <span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:brown;"></span>
                                         </button>
+                                        <span>
+                                        <details><summary><label>Description:</label></summary><textarea ng-model="l.notes[0]" rows="4" class="form-control"></textarea></details>
+                                        </span>
                                     </li>
                                 </ul>
                             </div>
@@ -456,7 +456,11 @@
                                         </select>
                                     </div>
                                     <div ng-if="a.statistic[0]['@type'] === 'RScript'">
-                                        <img src="js/dyntree/skin/../../../css/dyntree/skin/Rlogo.png" alt=""> File: <input ng-model="a.statistic[0].fileName" existingfile>
+                                        <img src="js/dyntree/skin/../../../css/dyntree/skin/Rlogo.png" alt=""> File: <input name="r-script-file-{{analysisGroup.id}}" ng-model="a.statistic[0].fileName" existingfile required>
+                                        <!--<div ngMessages="form['r-script-file-'+{{analysisGroup.id}}]" roles="alert">
+                                            <span ngMessage="required">The file name can not be empty</span>
+                                            <span ngMessage="$error">The specified file does not exist or it is empty.</span>
+                                        </div> -->
                                         <span>
                                             <button type="button" class="btn btn-primary" ng-click="runRScript(a.statistic[0].fileName);">
                                                 <span class="glyphicon glyphicon-play"></span>
@@ -625,7 +629,11 @@
                             </h5>
                             <ul>
                                 <li ng-repeat="f in r.results">
-                                    File: <input ng-model="f.file.name" existingfile>
+                                    File: <input id="raw-results-file" name="raw-results-file" ng-model="f.file.name" existingfile required>
+                                    <!-- <div>
+                                        <span ng-show="form.raw-results-file.$error.required">The file name can not be empty.</span>
+                                        <span ng-show="!form.raw-results-file.$valid">The specified file does not exist or it is empty.</span>
+                                    </div> -->
                                     <button class="btn btn-default" ng-click="removeResultFromRun(c.id, r.id, f.file.name)"  type="button">
                                         <span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:brown;"></span>
                                     </button>
@@ -647,7 +655,6 @@
                     </div>
                 </div>
             </section>
-
     </form>
 </div>
 
@@ -669,6 +676,7 @@
     details>summary>legend {
         font-size: 12px;
         display:block;
-    }    
+    }
+    
 
 </style>

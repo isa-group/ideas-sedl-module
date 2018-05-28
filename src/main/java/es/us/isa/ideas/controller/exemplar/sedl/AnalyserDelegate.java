@@ -315,14 +315,15 @@ class AnalyserDelegate {
             return response;
         }
         
-        public AppResponse generateSeedStudy(String content, String fileUri, String format){
+        public AppResponse generateSeedStudy(String content, String fileUri, String additionalInfo){
             AppResponse response = constructBaseResponse(fileUri);
             String columnSeparator=";";
             try {
 			BasicExperiment exp = getExperimentFromCode(content);
 			List errors = new ArrayList();
                         LatexSeedStudyGenerator studyGenerator=new LatexSeedStudyGenerator();
-                        response.setMessage(studyGenerator.generate(exp));
+                        response.setMessage(studyGenerator.generate(exp,additionalInfo));
+                        response.setHtmlMessage("<pre>"+response.getMessage()+"</pre>");
             }catch(Exception e){
                 response.setMessage(e.getMessage());
                 response.setStatus(Status.ERROR);

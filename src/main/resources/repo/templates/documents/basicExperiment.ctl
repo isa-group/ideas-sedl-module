@@ -1060,6 +1060,10 @@ $scope.findIndexInForProperty = function (value, set,property){
 }
 
 $scope.runRScript=function(file){
+    var oldFileUriOperation=fileUriOperation;
     fileUriOperation=selectedWorkspace+'/'+file;
-    launchOperation('ideas-R-language','executeScript',fileUriOperation);
+    //EditorManager.openFile(fileUriOperation,function(content){
+        launchOperation('ideas-R-language','executeScript',fileUriOperation);
+    //});
+    fileUriOperation=oldFileUriOperation;
 }
