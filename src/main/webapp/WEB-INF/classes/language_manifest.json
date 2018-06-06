@@ -87,34 +87,62 @@
         "name": "Compute Stats",
         "data": {},
         "_remoteExecution": "false",
-        "action": "function(operationStructure, fileUri) {
-                var res;
-                var view;
-                CommandApi.doDocumentOperation(operationStructure.id, operationStructure.data, EditorManager.currentUri, function(result){
-                res = result;
-                        $.ajax('/ideas - sedl - language/language/operationView/'+operationStructure.id, {
-                        'type' : 'get',
-                                'data' : operationStructure.id,
-                                'success' : function(result) {
-                                view = result;
-                                        console.log('[INFO]'+result.document);
-
-                                },
-                                'onError' : function(result) {
-                                console.log('[ERROR] '+result);
-                                },
-                                'async' : false,
-                        });
-
-                        CommandApi.fetchFileContentsBeforeExecutingOperation(operationStructure, fileUri, 'csv',
-                        'computestatscalc', 'COMPUTE STATS CONFIGURATION', view,
-                        'RUN other file', function(result){}, function(result){});
-
-                }, false);
-                //console.log(res);
-                loadConfigurations(res.data);
-
-        }"
+        "action": "
+//# sourceURL=sedl-ideas-Module-COMPUTE-STATS.js
+function (operationStructure, fileUri) {
+    var res;
+    var view;
+    var dataFile = null;
+    var dataFileContent = null;
+    CommandApi.doDocumentOperation(operationStructure.id, operationStructure.data, EditorManager.currentUri, function (result) {
+        res = result;
+        if (result && result.status == 'OK') {
+            var data = JSON.parse(result.data);
+            if (data.execution.length != null) {
+                dataFile = data.execution[0];
+                dataFileContent=$.ajax({url:'/files/get/'+WorkspaceManager.getSelectedWorkspace() + '/' + dataFile,
+                        type:'get', data:{},async:false}).responseText;                                        
+                if(dataFileContent){    
+                    data = operation.data;
+                    CommandApi.doDocumentOperation('computestatscalc', data, fileUri, function (result) {
+                        console.log(result);
+                    },
+                            true,
+                            dataFileContent);
+                }
+            }
+        }
+        if (!dataFile || !dataFileContent) {
+            $.ajax('/ideas-sedl-language/language/operationView/' + operationStructure.id, {
+                'type': 'get',
+                'data': operationStructure.id,
+                'success': function (result) {
+                    view = result;
+                    console.log('[INFO]' + result.document);
+                    CommandApi.fetchFileContentsBeforeExecutingOperation(
+                            operationStructure,
+                            fileUri,
+                            'csv',
+                            'computestatscalc',
+                            'COMPUTE STATS CONFIGURATION',
+                            view,
+                            'RUN other file',
+                            function (result) {},
+                            function (result) {
+                                loadConfigurations(res.data);
+                            },
+                            false
+                            );
+                },
+                'onError': function (result) {
+                    console.log('[ERROR] ' + result);
+                },
+                'async': true,
+            });
+        }
+    }, false);
+}
+            "
         }
 
         ],

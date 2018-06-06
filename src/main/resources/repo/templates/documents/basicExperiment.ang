@@ -1,4 +1,4 @@
-<div id="sedl-wrapper">
+<div id="sedl-wrapper" ng-cloak>
     <form action="" name="form" id="form">
         <h1> Experiment <input ng-model="model.id" required ng-pattern="/^[a-zA-Z]([a-zA-Z0-9]|-|_)+$/" name="ExperimentID" id="ExperimentID">
             <span class="btn-group">
@@ -22,7 +22,7 @@
             <span ng-show="!form.ExperimentID.$valid">The experiment identifier must follow the pattern: a letter followed by a sequence of letters, numbers, or the characters '-' or '_'.</span>
         </div>
         <ul class="nav nav-tabs">
-            <li class="active"><a data-toggle="tab" href="#DescriptionAndContext">Context</a></li>
+            <li class="active"><a data-toggle="tab" href="#DescriptionAndContext">Overview</a></li>
             <li><a data-toggle="tab" href="#Variables">Variables</a></li>
             <li><a data-toggle="tab" href="#Hypotheses">Hypotheses</a></li>
             <li><a data-toggle="tab" href="#Design">Design</a></li>
@@ -31,24 +31,26 @@
         </ul>
         <div class="tab-content">
             <section id="DescriptionAndContext" class="tab-pane fade in active">
-                
                 <details>
-                    <summary>Description:</summary>
+                    <summary>Abstract:</summary>
                     Format:
                     <select ng-model="descriptionType">
                         <option value="FreeForm">Free form</option>
                         <option value="StructuredAbstract">Structured Abstract</option>
                     </select>
                     <div ng-if="descriptionType == 'FreeForm'">
-                        <textarea ng-model="model.notes[0]" cols="80" rows="12"> </textarea>
+                        <text-angular ng-model="model.notes[0]"> </text-angular>
                     </div>
                     <div ng-if="descriptionType == 'StructuredAbstract'" class="well">
                         <table style="min-width: 100%">
-                            <tr><th>Context:</th><td><textarea ng-model="model.notes[0]" cols="80" rows="3" class="form-control"></textarea></td></tr>
-                            <tr><th>Goal:</th><td><textarea ng-model="model.notes[1]" cols="80" rows="3" class="form-control"></textarea></td></tr>
-                            <tr><th>Method:</th><td><textarea ng-model="model.notes[2]" cols="80" rows="3" class="form-control"></textarea></td></tr>
-                            <tr><th>Results:</th><td><textarea ng-model="model.notes[3]" cols="80" rows="3" class="form-control"></textarea></td></tr>
-                            <tr><th>Conclusions:</th><td><textarea ng-model="model.notes[4]" cols="80" rows="3" class="form-control"></textarea></td></tr>
+                            <tr><th>Context:</th><td>
+                                <text-angular ng-model="model.notes[0]" ta-default-wrap="span"></text-angular>
+                                <!-- <textarea ng-model="model.notes[0]" cols="80" rows="3" class="form-control"></textarea> -->
+                            </td></tr>
+                            <tr><th>Goal:</th><td><text-angular ng-model="model.notes[1]" ta-default-wrap="span"></text-angular></td></tr>
+                            <tr><th>Method:</th><td><text-angular ng-model="model.notes[2]" ta-default-wrap="span"></text-angular></td></tr>
+                            <tr><th>Results:</th><td><text-angular ng-model="model.notes[3]"ta-default-wrap="span"></text-angular></td></tr>
+                            <tr><th>Conclusions:</th><td><text-angular ng-model="model.notes[4]" ta-default-wrap="span"></text-angular></td></tr>
                             </table>
                         </div>
                 </details>
@@ -62,15 +64,15 @@
                             <option value="GQM">Goal-Question-Metric</option>
                         </select>
                         <div ng-if="goalType == 'FreeForm'">
-                            <textarea ng-model="model.context.notes[0]" cols="80" rows="12"> </textarea>
+                            <text-angular ng-model="model.context.notes[0]"  ta-default-wrap="span"> </text-angular>
                         </div>
                         <div ng-if="goalType == 'GQM'" class="well">
                             <table style="min-width: 100%">
-                            <tr><th>Analyze </th><td> <textarea ng-model="model.context.notes[0]" cols="80" rows="2" class="form-control"></textarea></td></tr>
-                            <tr><th>for the purpose of </th><td> <textarea ng-model="model.context.notes[1]" cols="80" rows="2" class="form-control"></textarea></td></tr>
-                            <tr><th>with respect to </th><td> <textarea ng-model="model.context.notes[2]" cols="80" rows="2" class="form-control"></textarea></td></tr>
-                            <tr><th>from the point of view of </th><td><textarea ng-model="model.context.notes[3]" cols="80" class="form-control"></textarea></td></tr>
-                            <tr><th>in the context of </th><td><textarea ng-model="model.context.notes[4]" cols="80" rows="2" class="form-control"></textarea></td></tr>
+                            <tr><th>Analyze </th><td> <text-angular ng-model="model.context.notes[0]" ta-default-wrap="span"></text-angular></td></tr>
+                            <tr><th>for the purpose of </th><td> <text-angular ng-model="model.context.notes[1]" ta-default-wrap="span"></text-angular></td></tr>
+                            <tr><th>with respect to </th><td> <text-angular ng-model="model.context.notes[2]" ta-default-wrap="span"></text-angular></td></tr>
+                            <tr><th>from the point of view of </th><td><text-angular ng-model="model.context.notes[3]" ta-default-wrap="span"></text-angular></td></tr>
+                            <tr><th>in the context of </th><td><text-angular ng-model="model.context.notes[4]" ta-default-wrap="span"></text-angular></td></tr>
                             </table>
                         </div>
                 </details>
@@ -95,7 +97,7 @@
                             <input ng-model="p.name"  size="40" required/>
                             <details>
                                 <summary>Tasks in this experiment:</summary>
-                                <textarea ng-model="p.notes[0]" cols="30" rows="5" class="form-control"></textarea>
+                                <text-angular ng-model="p.notes[0]"  ta-default-wrap="span"></text-angular>
                             </details>
                         </td>
                         <td><input ng-model="p.email" size="20" required type="email"/></td>
@@ -108,6 +110,10 @@
                         <td><button class="btn btn-default" ng-click="removePeople(p.email)" type="button"><span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:brown;"></span></button></td>
                     </tr>
                 </table>
+                </details>
+                <details>
+                    <summary>Conclusions:</summary>
+                    <text-angular ng-model="model.notes[4]" ta-default-wrap="span"></text-angular>
                 </details>
             </section>
             <section id="Hypotheses" class="tab-pane fade">
@@ -147,7 +153,7 @@
                             <div>
                                 <details>
                                     <summary>Description:</summary>
-                                    <textarea ng-model="h.notes[0]" class="form-control"></textarea>
+                                    <text-angular ng-model="h.notes[0]"  ta-default-wrap="span"></text-angular>
                                 </details>
                             </div>
                     </div>
@@ -183,7 +189,7 @@
                             </summary>
                         <div>
                             <label>Description:</label>
-                            <textarea ng-model="v.notes[0]" class="form-control"  rows="2" ></textarea>
+                            <text-angular ng-model="v.notes[0]"  ta-default-wrap="span"></text-angular>
                         </div>
                         <div>
                         <label>Domain</label>
@@ -211,7 +217,7 @@
                                             <span class="glyphicon glyphicon-trash" aria-hidden="true" style="color:brown;"></span>
                                         </button>
                                         <span>
-                                        <details><summary><label>Description:</label></summary><textarea ng-model="l.notes[0]" rows="4" class="form-control"></textarea></details>
+                                        <details><summary><label>Description:</label></summary><text-angular ng-model="l.notes[0]"  ta-default-wrap="span"></text-angular></details>
                                         </span>
                                     </li>
                                 </ul>
@@ -250,6 +256,10 @@
                         </optgroup>
                     </select>
                 </h2>
+                <details>
+                    <summary>Description:</summary>
+                    <text-angular ng-model="model.design.notes[0]"  ta-default-wrap="span"> </text-angular>
+                </details>
                 <div id="designParameters">
                     <h3><button class="btn  btn-default" ng-click="addDesignParameter()" type="button">
                             <span class="glyphicon glyphicon-plus" aria-hidden="true" style="color:#9e9e9e;margin-right:10px;">
@@ -318,6 +328,7 @@
                     </h3>
                     <table class="table table-striped table-bordered">
                         <tr ng-repeat="step in model.design.experimentalDesign.experimentalProtocol.steps">
+                            <td>{{step.id}}</td>
                             <td>
                                 <select ng-model="step['@type']">
                                     <option ng-value="Measurement">Measurement</option>
@@ -388,12 +399,14 @@
                         </h4>
                         <table class="table table-striped table-bordered">
                             <tr>
+                                <th>Id</th>
                                 <th>Analysis Type</th>
                                 <th>Details</th>
                                 <th>Data spec</th>
                                 <th></th>
                             </tr>
                             <tr ng-repeat="a in analysisGroup.analyses">
+                                <td>{{a.id}}</input></td>
                                 <td>
                                     <select ng-model="a.statistic[0]['@type']">
                                         <optgroup label="Descriptive Statistics - Cental tendency">
@@ -618,7 +631,7 @@
                                 </div>
                             </div>
                             Log:
-                            <textarea ng-model="r.log" class="form-control col-lg-4 col-md-4" col-sm-6 id="executionLog"></textarea>
+                            <text-angular ng-model="r.log.lines[0].message" ta-default-wrap="span"></text-angular>
                             <div>
                             <h5>
                                 <button class="btn btn-default" ng-click="addResult(c.id, r.id)"  type="button">
@@ -678,5 +691,20 @@
         display:block;
     }
     
+    .ta-toolbar{
+        display: none;
+    }
+    
+    .ta-toolbar.focussed{
+        display: block;
+    }
+    
+    .ta-editor { 
+        min-height: 20px !important;
+    }
+    
+    .ta-bind {
+        min-height: 20px !important;
+    }
 
 </style>

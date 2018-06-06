@@ -1022,6 +1022,7 @@ $scope.uploadRawDataFile = function(configId,runId,f){
 }
 
 $scope.generateStudySeed=function(){
+    FileApi.loadWorkspace(WorkspaceManager.getSelectedWorkspace(), function(ts){
     CommandApi.doDocumentOperation("generateSeedStudy", {}, EditorManager.currentUri, function (latex) {
         showContentAsModal("app/modalWindows/createNewFileOfLanguage?language=tex&languageId=ideas-latex-language",
                     function () {
@@ -1035,8 +1036,10 @@ $scope.generateStudySeed=function(){
                                     
                                 });
                             });
-                        },false);
-                });
+                        }
+                        );
+                },false,JSON.stringify(ts));
+    });
 }
 
 $scope.findIndexIn = function (value, set){
@@ -1064,6 +1067,6 @@ $scope.runRScript=function(file){
     fileUriOperation=selectedWorkspace+'/'+file;
     //EditorManager.openFile(fileUriOperation,function(content){
         launchOperation('ideas-R-language','executeScript',fileUriOperation);
-    //});
+    //}); 
     fileUriOperation=oldFileUriOperation;
 }

@@ -392,7 +392,12 @@
             <version>15.0</version>
             <classifier>cdi1.0</classifier>
         </dependency>                                                        
-		
+        <!-- HTML2Latex -->
+        <dependency>
+            <groupId>htmltolatex</groupId>
+            <artifactId>htmltolatex</artifactId>
+            <version>0.8-SNAPSHOT</version>            
+        </dependency>
     </dependencies>
 	
     <!-- BUILD CONFIGURATION -->

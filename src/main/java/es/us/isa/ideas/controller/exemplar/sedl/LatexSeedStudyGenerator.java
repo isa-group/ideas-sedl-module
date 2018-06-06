@@ -10,6 +10,7 @@ import com.google.common.collect.Lists;
 import es.us.isa.ideas.controller.exemplar.sedl.util.Node;
 import es.us.isa.sedl.core.BasicExperiment;
 import es.us.isa.sedl.core.analysis.statistic.Statistic;
+import es.us.isa.sedl.core.configuration.Configuration;
 import es.us.isa.sedl.core.context.Person;
 import es.us.isa.sedl.core.design.AnalysisSpecification;
 import es.us.isa.sedl.core.design.AnalysisSpecificationGroup;
@@ -33,11 +34,16 @@ import es.us.isa.sedl.core.design.Sizing;
 import es.us.isa.sedl.core.design.StatisticalAnalysisSpec;
 import es.us.isa.sedl.core.design.Treatment;
 import es.us.isa.sedl.core.design.VariableValuation;
+import es.us.isa.sedl.core.execution.Execution;
+import es.us.isa.sedl.core.execution.Log;
+import es.us.isa.sedl.core.execution.LogLine;
 import es.us.isa.sedl.core.hypothesis.AssociationalHypothesis;
 import es.us.isa.sedl.core.hypothesis.DifferentialHypothesis;
 import es.us.isa.sedl.core.hypothesis.Hypothesis;
 import es.us.isa.sedl.core.hypothesis.RelationalHypothesis;
 import es.us.isa.sedl.marshaller.SEDL4PeopleMarshaller;
+import html2latex.FatalErrorException;
+import html2latex.Parser;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -57,15 +63,17 @@ public class LatexSeedStudyGenerator {
     private Map<String, List<String>> importedPackages;
     private List<URL> dependences;
     private SEDL4PeopleMarshaller marshaller;
+    private html2latex.Parser html2LatexParser;
 
     public LatexSeedStudyGenerator() {
         this("article", new HashMap<String, List<String>>());
         importedPackages.put("color", Collections.EMPTY_LIST);
         importedPackages.put("hyperref", Collections.EMPTY_LIST);
         importedPackages.put("inputenc", Lists.newArrayList("latin1"));
-        importedPackages.put("babel",Lists.newArrayList("english"));
+        importedPackages.put("babel", Lists.newArrayList("english"));
         dependences = new ArrayList<>();
-        this.marshaller=new SEDL4PeopleMarshaller();
+        this.marshaller = new SEDL4PeopleMarshaller();
+        html2LatexParser = new Parser();
     }
 
     protected LatexSeedStudyGenerator(String documentClass, Map<String, List<String>> importedPackages) {
@@ -73,26 +81,27 @@ public class LatexSeedStudyGenerator {
         this.importedPackages = importedPackages;
     }
 
-    public String generate(BasicExperiment exp,String additionalInfo) {
+    public String generate(BasicExperiment exp, String additionalInfo) {
         StringBuilder builder = new StringBuilder();
         builder.append(generatePreamble(exp))
                 .append(generateFrontMatter(exp))
                 .append(generateBody(exp))
-                .append(generateAppendixes(exp,additionalInfo))
+                .append(generateAppendixes(exp, additionalInfo))
                 .append(generateClosing(exp));
         return builder.toString();
     }
 
     private String generatePreamble(BasicExperiment exp) {
         StringBuilder builder = new StringBuilder("\\documentclass{" + documentClass + "}\n");
-        for (String packageToImport : importedPackages.keySet()) {            
+        for (String packageToImport : importedPackages.keySet()) {
             builder.append("\\usepackage");
-            List<String> options=importedPackages.get(packageToImport);
-            if(options!=null && !options.isEmpty()){
+            List<String> options = importedPackages.get(packageToImport);
+            if (options != null && !options.isEmpty()) {
                 builder.append("[");
-                for(int i=0;i<options.size();i++){
-                    if(i!=0)
+                for (int i = 0; i < options.size(); i++) {
+                    if (i != 0) {
                         builder.append(",");
+                    }
                     builder.append(options.get(i));
                 }
                 builder.append("]");
@@ -117,12 +126,12 @@ public class LatexSeedStudyGenerator {
     }
 
     private String generateBody(BasicExperiment exp) {
-        return generateIntro(exp) + 
-                generateVariables(exp) + 
-                generateHypotheses(exp) + 
-                generateDesign(exp) + 
-                generateConduction(exp) +
-                generateAnalyses(exp) +"\n";
+        return generateIntro(exp)
+                + generateVariables(exp)
+                + generateHypotheses(exp)
+                + generateDesign(exp)
+                + generateConduction(exp)
+                + generateAnalyses(exp) + "\n";
     }
 
     private String generateIntro(BasicExperiment exp) {
@@ -136,16 +145,16 @@ public class LatexSeedStudyGenerator {
         String result = "";
         List<String> notes = exp.getContext().getNotes();
         if (notes.size() == 1) {
-            result = exp.getContext().getNotes().get(0) + "\\n";
+            result = html2latex(exp.getContext().getNotes().get(0)) + "\\n";
         } else if (notes.size() > 2) {
             for (int i = 0; i < (5 - notes.size()); i++) {
                 notes.add("");
             }
-            result += "\\textbf{Analyze} " + notes.get(0);
-            result += " \\textbf{for the purpose of} " + notes.get(1);
-            result += " \\textbf{with respect to} " + notes.get(2);
-            result += " \\textbf{from the point of view of} " + notes.get(3);
-            result += " \\textbf{in the context of} " + notes.get(4);
+            result += "\\textbf{Analyze} " + html2latex(notes.get(0));
+            result += " \\textbf{for the purpose of} " + html2latex(notes.get(1));
+            result += " \\textbf{with respect to} " + html2latex(notes.get(2));
+            result += " \\textbf{from the point of view of} " + html2latex(notes.get(3));
+            result += " \\textbf{in the context of} " + html2latex(notes.get(4));
         }
         return result;
     }
@@ -160,8 +169,8 @@ public class LatexSeedStudyGenerator {
                 + "Finally, section \\ref{sec:conclusions} describes the conclusions drawn from the study.";
     }
 
-    private String generateAppendixes(BasicExperiment exp,String additionalInfo) {
-        return generateAcnowledgements(exp)+ "\\appendix\n" + generateMaterialsListing(exp,additionalInfo);
+    private String generateAppendixes(BasicExperiment exp, String additionalInfo) {
+        return generateAcnowledgements(exp) + "\\appendix\n" + generateMaterialsListing(exp, additionalInfo);
     }
 
     private String generateTitle(BasicExperiment exp) {
@@ -206,7 +215,7 @@ public class LatexSeedStudyGenerator {
     private String generateAbstract(BasicExperiment exp) {
         String content = "";
         if (exp.getNotes().size() == 1) {
-            content = exp.getNotes().get(0);
+            content = html2latex(exp.getNotes().get(0));
         } else {
             content = generateStructuredAbstractContent(exp);
         }
@@ -223,11 +232,11 @@ public class LatexSeedStudyGenerator {
                 notes.add("");
             }
         }
-        String result = "\\textbf{Context:}" + notes.get(0);
-        result += "\\textbf{Goal:}" + notes.get(1);
-        result += "\\textbf{Method:}" + notes.get(2);
-        result += "\\textbf{Results:}" + notes.get(3);
-        result += "\\textbf{Conclusions:}" + notes.get(4);
+        String result = "\\textbf{Context:}" + html2latex(notes.get(0));
+        result += "\\textbf{Goal:}" + html2latex(notes.get(1));
+        result += "\\textbf{Method:}" + html2latex(notes.get(2));
+        result += "\\textbf{Results:}" + html2latex(notes.get(3));
+        result += "\\textbf{Conclusions:}" + html2latex(notes.get(4));
         return result;
     }
 
@@ -252,7 +261,7 @@ public class LatexSeedStudyGenerator {
     private String generateHypothesis(Hypothesis h, BasicExperiment exp) {
         String result = "";
         for (String note : h.getNotes()) {
-            result += note + ". \n";
+            result += html2latex(note) + ". \n";
         }
         result += "In general, this hypotheis can be stated as: \\textit{the value of " + h.getDependentVariable();
         if (h instanceof DifferentialHypothesis) {
@@ -286,7 +295,7 @@ public class LatexSeedStudyGenerator {
             }
             result += "\\textit{" + h.getIndependentVariables().get(i) + "}";
         }
-        result+="; and the \\textit{alternative hypothesis} ${" + h.getId() + "}_0$: $\\neg{H_{0,2}}$,"
+        result += "; and the \\textit{alternative hypothesis} ${" + h.getId() + "}_0$: $\\neg{H_{0,2}}$,"
                 + " that states that such a difference in the means exists and it is not due to chance.";
         return result;
     }
@@ -320,9 +329,11 @@ public class LatexSeedStudyGenerator {
     private String printVariable(Variable var, String indentation) {
         StringBuilder builder = new StringBuilder(indentation + "\\item ");
         builder.append("\\textbf{" + var.getName() + "}:\n");
-        if(!var.getNotes().isEmpty())
-        for(String note:var.getNotes())    
-            builder.append(indentation + note+" \n");
+        if (!var.getNotes().isEmpty()) {
+            for (String note : var.getNotes()) {
+                builder.append(indentation + html2latex(note) + " \n");
+            }
+        }
         builder.append(indentation + "The domain of this variable is a " + printDomain(var.getDomain(), indentation));
         if (var.getUnits() != null && !"".equals(var.getUnits())) {
             builder.append(indentation + "This variable is measured in " + var.getUnits() + ".\n");
@@ -341,39 +352,41 @@ public class LatexSeedStudyGenerator {
         return result;
     }
 
-    private String generateMaterialsListing(BasicExperiment exp,String additionalInfo) {
-     
-        StringBuilder sb=new StringBuilder();
-        if(additionalInfo!=null && !"".equals(additionalInfo)){
-            
-            ObjectMapper om=new ObjectMapper();
+    private String generateMaterialsListing(BasicExperiment exp, String additionalInfo) {
+
+        StringBuilder sb = new StringBuilder();
+        if (additionalInfo != null && !"".equals(additionalInfo)) {
+
+            ObjectMapper om = new ObjectMapper();
             try {
-                Node[] nodes=om.readValue(additionalInfo, Node[].class);
+                Node[] nodes = om.readValue(additionalInfo, Node[].class);
                 sb.append("\\section{Materials}\n\\label{sec:materials}\n");
                 sb.append("\\begin{itemize}\n");
-                for(Node n:nodes){
-                    sb.append("    \\item \n"+printNode(n,"     "));
+                for (Node n : nodes) {
+                    sb.append("    \\item \n" + printNode(n, "     "));
                 }
                 sb.append("\\end{itemize}\n");
             } catch (IOException ex) {
                 Logger.getLogger(LatexSeedStudyGenerator.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
                 ex.printStackTrace();
             }
-            
+
         }
         return sb.toString();
     }
-    
-    private String printNode(Node n,String indentation){
-        StringBuilder sb=new StringBuilder(indentation+n.getTitle());
-        if(n.getDescription()!=null && !"".equals(n.getDescription()) && !"null".equals(n.getDescription()))
+
+    private String printNode(Node n, String indentation) {
+        StringBuilder sb = new StringBuilder(indentation + n.getTitle());
+        if (n.getDescription() != null && !"".equals(n.getDescription()) && !"null".equals(n.getDescription())) {
             sb.append(n.getDescription());
+        }
         sb.append("\n");
-        if(n.getIsFolder() && !n.getChildren().isEmpty()){
-            sb.append(indentation+"\\begin{itemize}\n");
-            for(Node child:n.getChildren())
-                sb.append(indentation+"\\item \n"+printNode(child,indentation+"    "));
-            sb.append(indentation+"\\end{itemize}\n");
+        if (n.getIsFolder() && !n.getChildren().isEmpty()) {
+            sb.append(indentation + "\\begin{itemize}\n");
+            for (Node child : n.getChildren()) {
+                sb.append(indentation + "\\item \n" + printNode(child, indentation + "    "));
+            }
+            sb.append(indentation + "\\end{itemize}\n");
         }
         return sb.toString();
     }
@@ -385,9 +398,11 @@ public class LatexSeedStudyGenerator {
                 append(indentation + "\\begin{itemize}\n");
         for (Level l : e.getLevels()) {
             builder.append(indentation + "  \\item \\textit{" + l.getValue() + "} \n");
-            if(!l.getNotes().isEmpty())
-                for(String note:l.getNotes())
-                builder.append(indentation + note +"\n");
+            if (!l.getNotes().isEmpty()) {
+                for (String note : l.getNotes()) {
+                    builder.append(indentation + html2latex(note) + "\n");
+                }
+            }
         }
         builder.append(indentation + "\\end{itemize}\n");
         return builder.toString();
@@ -439,12 +454,18 @@ public class LatexSeedStudyGenerator {
     }
 
     private String generateDesign(BasicExperiment exp) {
-        return "\\section{Design}\n\\label{sec:design}\n"
-                + generateSampling(exp)
-                + generateAssignment(exp)
-                + generateGroups(exp)
-                + generateBlockingVariables(exp)
-                + generateProtocol(exp);
+        StringBuilder sb = new StringBuilder("\\section{Design}\n\\label{sec:design}\n");
+        if (!exp.getDesign().getNotes().isEmpty()) {
+            for (String note : exp.getDesign().getNotes()) {
+                sb.append(html2latex(note));
+            }
+        }
+        sb.append(generateSampling(exp))
+                .append(generateAssignment(exp))
+                .append(generateGroups(exp))
+                .append(generateBlockingVariables(exp))
+                .append(generateProtocol(exp));
+        return sb.toString();
     }
 
     private String generateGroups(BasicExperiment exp) {
@@ -464,12 +485,17 @@ public class LatexSeedStudyGenerator {
     }
 
     private String generateProtocol(BasicExperiment exp) {
-        FullySpecifiedExperimentalDesign fsed=(FullySpecifiedExperimentalDesign)exp.getDesign().getExperimentalDesign();
-        return "\\subsection{Experimental protocol}\n\\label{sec:group}\n"+generateExperimentlProtocol(exp,fsed.getExperimentalProtocol());
+        FullySpecifiedExperimentalDesign fsed = (FullySpecifiedExperimentalDesign) exp.getDesign().getExperimentalDesign();
+        return "\\subsection{Experimental protocol}\n\\label{sec:group}\n" + generateExperimentlProtocol(exp, fsed.getExperimentalProtocol());
     }
 
     private String generateConduction(BasicExperiment exp) {
-        return "\\section{Conduction}\n\\label{sec:conduction}\n";
+        StringBuilder sb=new StringBuilder("\\section{Conduction}\n\\label{sec:conduction}\n");
+        if(!exp.getConfigurations().isEmpty()){
+            for(Configuration config:exp.getConfigurations())
+                sb.append(printConfiguration(config,exp));
+        }
+        return sb.toString();
     }
 
     private String generateAcnowledgements(BasicExperiment exp) {
@@ -483,7 +509,7 @@ public class LatexSeedStudyGenerator {
         String result = "";
         if (exp.getDesign().getSamplingMethod() != null) {
             result = "\\subsection{Sampling}\n";
-            result += exp.getDesign().getSamplingMethod().getDescription();
+            result += html2latex(exp.getDesign().getSamplingMethod().getDescription());
             result += "\n";
         }
         return result;
@@ -548,30 +574,34 @@ public class LatexSeedStudyGenerator {
         return result;
     }
 
-    private String generateExperimentlProtocol(BasicExperiment exp,ExperimentalProtocol experimentalProtocol) {
-        StringBuilder sb=new StringBuilder("\\begin{table}[h]\n");
+    private String generateExperimentlProtocol(BasicExperiment exp, ExperimentalProtocol experimentalProtocol) {
+        StringBuilder sb = new StringBuilder("\\begin{table}[h]\n");
         sb.append("  \\begin{tabular}{|l|l|l|l|}\n")
-          .append("  \\hline\n")
-          .append("  \\textbf{Id} & \\textbf{Type} & \\textbf{On Group} & \\textbf{Details} \\\\ \n" )
+                .append("  \\hline\n")
+                .append("  \\textbf{Id} & \\textbf{Type} & \\textbf{On Group} & \\textbf{Details} \\\\ \n")
                 .append("  \\hline\n");
-        for(ExperimentalProtocolStep step:experimentalProtocol.getSteps()){
-            sb.append("  "+step.getId()+" & "+step.getClass().getSimpleName()+" & "+step.getGroup());
-            if(step instanceof Measurement){
+        for (ExperimentalProtocolStep step : experimentalProtocol.getSteps()) {
+            sb.append("  " + step.getId() + " & " + step.getClass().getSimpleName() + " & " + step.getGroup());
+            if (step instanceof Measurement) {
                 sb.append(" & of ");
-                List<String> variables=((Measurement) step).getVariable();
-                if(variables.isEmpty())
-                    for(Variable v:exp.getDesign().getVariables().getOutcomes())
+                List<String> variables = ((Measurement) step).getVariable();
+                if (variables.isEmpty()) {
+                    for (Variable v : exp.getDesign().getVariables().getOutcomes()) {
                         variables.add(v.getName());
-                for(String variable:((Measurement) step).getVariable()){
-                    sb.append(variable+" ");
-                }                
+                    }
+                }
+                for (String variable : ((Measurement) step).getVariable()) {
+                    sb.append(variable + " ");
+                }
                 sb.append("  setting ");
-                for(VariableValuation vv:((Measurement) step).getVariableValuation())
-                    sb.append(vv.getVariable().getName()+" to "+vv.getLevel().getValue()+"    ");
-            }else if(step instanceof Treatment){
+                for (VariableValuation vv : ((Measurement) step).getVariableValuation()) {
+                    sb.append(vv.getVariable().getName() + " to " + vv.getLevel().getValue() + "    ");
+                }
+            } else if (step instanceof Treatment) {
                 sb.append(" & setting ");
-                for(VariableValuation vv:((Treatment) step).getVariableValuation())
-                    sb.append(vv.getVariable().getName()+" to "+vv.getLevel().getValue()+"    ");
+                for (VariableValuation vv : ((Treatment) step).getVariableValuation()) {
+                    sb.append(vv.getVariable().getName() + " to " + vv.getLevel().getValue() + "    ");
+                }
             }
             sb.append(" \\\\ \n");
             sb.append(" \\hline \n");
@@ -583,27 +613,29 @@ public class LatexSeedStudyGenerator {
         sb.append("\\end{table}\n");
         return sb.toString();
     }
-    
-    public String generateAnalyses(BasicExperiment exp){
-        return "\\section{Analyses}\n\\label{sec:analyses}\n"+
-                generateIndendedAnalysies(exp) +
-                generateAnalysisResults(exp);
+
+    public String generateAnalyses(BasicExperiment exp) {
+        return "\\section{Analyses}\n\\label{sec:analyses}\n"
+                + generateIndendedAnalysies(exp)
+                + generateAnalysisResults(exp);
     }
 
     private String generateIndendedAnalysies(BasicExperiment exp) {
-        StringBuilder sb=new StringBuilder("\\subsection{Intended analyses}\n\\label{sec:intended-analyses}\n");
+        StringBuilder sb = new StringBuilder("\\subsection{Intended analyses}\n\\label{sec:intended-analyses}\n");
         FullySpecifiedExperimentalDesign design = (FullySpecifiedExperimentalDesign) exp.getDesign().getExperimentalDesign();
-        for(AnalysisSpecificationGroup ag:design.getIntendedAnalyses()){
-            sb.append("\\subsubsection{"+ag.getId()+"}\n");
+        for (AnalysisSpecificationGroup ag : design.getIntendedAnalyses()) {
+            sb.append("\\subsubsection{" + ag.getId() + "}\n");
             sb.append("\\begin{itemize}\n");
-            for(AnalysisSpecification as:ag.getAnalyses()){
+            for (AnalysisSpecification as : ag.getAnalyses()) {
                 sb.append("\\item ");
-                if(as.getId()!=null)
+                if (as.getId() != null) {
                     sb.append(as.getId());
-                if(as instanceof StatisticalAnalysisSpec)
-                    sb.append(generateStatisticalAnalysis(exp,(StatisticalAnalysisSpec)as));
+                }
+                if (as instanceof StatisticalAnalysisSpec) {
+                    sb.append(generateStatisticalAnalysis(exp, (StatisticalAnalysisSpec) as));
+                }
             }
-                sb.append("\n");
+            sb.append("\n");
             sb.append("\\end{itemize}\n");
         }
         return sb.toString();
@@ -614,17 +646,72 @@ public class LatexSeedStudyGenerator {
     }
 
     private String generateStatisticalAnalysis(BasicExperiment exp, StatisticalAnalysisSpec statisticalAnalysisSpec) {
-        StringBuilder result=new StringBuilder();
-        String aux=null;
-        for(Statistic statistic:statisticalAnalysisSpec.getStatistic()){
-            aux=marshaller.printStatistic(statistic);
-            aux=aux.replace("("," ");
-            aux=aux.replace(")","");            
-            aux=aux.replace("RScripts::", "Execute R script");
+        StringBuilder result = new StringBuilder();
+        String aux = null;
+        for (Statistic statistic : statisticalAnalysisSpec.getStatistic()) {
+            aux = marshaller.printStatistic(statistic);
+            aux = aux.replace("(", " ");
+            aux = aux.replace(")", "");
+            aux = aux.replace("RScripts::", "Execute R script ");
             result.append(aux);
         }
         return result.toString();
     }
-            
 
+    public String html2latex(String htmlContent) {
+        String result = htmlContent;
+        try {
+            result = html2LatexParser.parse("<span>"+htmlContent+"</span>");
+        } catch (FatalErrorException ex) {
+            Logger.getLogger(LatexSeedStudyGenerator.class.getName()).log(java.util.logging.Level.SEVERE, "ERROR transforming html text to latex:" + ex.getMessage(), ex);
+            ex.printStackTrace();
+        }
+        return result;
+    }
+
+    private String printConfiguration(Configuration config, BasicExperiment exp) {
+        StringBuilder sb=new StringBuilder();
+        if(!config.getExecutions().isEmpty()){
+            if(config.getExecutions().size()==1){
+                sb.append("The experiment has a single conduction (no replications) that is described next. ");
+                sb.append(printRun(config.getExecutions().get(0),exp));
+            }else{
+                sb.append("The experiment has "+config.getExecutions()+" internal replications that area described sequentially below. ");
+                for(Execution execution:config.getExecutions()){
+                    sb.append("\\subsection{"+execution.getId()+"}\n");
+                    sb.append(printRun(execution,exp));
+                }
+            }
+        }
+        return sb.toString();
+    }
+
+    private String printRun(Execution exec, BasicExperiment exp) {
+        StringBuilder sb=new StringBuilder();
+        if(exec.getStart()!=null && exec.getFinish()!=null)
+            sb.append("The  conduction lasted from "+exec.getStart()+" until "+exec.getFinish()+". \n");
+        else if(exec.getStart()!=null)
+            sb.append("The conduction started at "+exec.getStart()+". \n");
+        if(exec.getLog()!=null)
+            sb.append(printLog(exec.getLog(), exp));
+        return sb.toString();
+    }
+
+    private String printLog(Log log, BasicExperiment exp) {
+        StringBuilder sb=new StringBuilder();
+        if(!log.getLines().isEmpty()){
+            for(LogLine line:log.getLines()){
+                sb.append(printLogLine(line,exp));
+            }
+        }
+        return sb.toString();
+    }
+    
+    private String printLogLine(LogLine line,BasicExperiment exp){
+        String result="";
+        if(line.getTimestamp()!=null)
+            result+="\\textbf{ Annotated at '"+line.getTimestamp().toGMTString()+"'}:";
+        result+=html2latex(line.getMessage());
+        return result;
+    }
 }
