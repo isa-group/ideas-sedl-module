@@ -3,7 +3,7 @@
 
 <div id="op-body">
     <div id="configuration">
-        <label id="title">Configuration of the seed report:</label><br/>
+        <label id="title">Additional Contents of the seed report:</label><br/>
         <input id="includeMaterialsListing" name="includeMaterialsListing" type="checkbox"></input><label>Include listing of materials present in the workspace</label><br>
         <input id="includeAnalysisResults" name="includeAnalysisResults" type="checkbox"></input><label>Include the results of a just-in-time execution of the statistical analyses.</label>
     </div>   

@@ -6,6 +6,11 @@
                     <span class="glyphicon glyphicon-flash" aria-hidden="true"></span>
                     Generate seed report
                 </button>
+                
+                <button ng-click="computeAllTheStats()"class="btn btn-primary" type="button">
+                    <span class="glyphicon glyphicon-flash" aria-hidden="true"></span>
+                    Compute Statisics
+                </button> 
                 <!--<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                    <span class="caret"></span>
                    <span class="sr-only">Toggle Dropdown</span>
@@ -111,10 +116,6 @@
                     </tr>
                 </table>
                 </details>
-                <details>
-                    <summary>Conclusions:</summary>
-                    <text-angular ng-model="model.notes[4]" ta-default-wrap="span"></text-angular>
-                </details>
             </section>
             <section id="Hypotheses" class="tab-pane fade">
                 <h2>
@@ -132,6 +133,7 @@
                             <select ng-model="h['@type']">
                                 <option value="DifferentialHypothesis"> is impacted significantly by </option>
                                 <option value="AssociationalHypothesis"> is correlated with </option>
+                                <option value="DescriptiveHypothesis"> Described in natural Language </option>
                             </select>
                             <button class="btn  btn-default" ng-click="addNewIndependentVariableToHypothesis(h)" type="button">
                                 <span class="glyphicon glyphicon-plus" aria-hidden="true" style="color:#9e9e9e;margin-right:10px;"></span>
@@ -202,7 +204,8 @@
                                     Of type
                                     </option>
                                 </select>
-                                <span ng-if="v.domain['@type'] === 'ExtensionDomain'" class="input-group-addon">
+                                <span ng-if="v.domain['@type'] === 'ExtensionDomain'">
+                                    <input type="checkbox" ng-model="v.kind" ng-true-value="'ORDINAL'" ng-false-value="'NOMINAL'"><label>Ordered (ascending)</label>
                                     <button class="btn  btn-default" ng-click="addNewLevelToVariable(v.name)"  type="button">
                                         <span class="glyphicon glyphicon-plus" aria-hidden="true" style="color:#9e9e9e;margin-right:10px;">
                                         </span>
@@ -469,7 +472,8 @@
                                         </select>
                                     </div>
                                     <div ng-if="a.statistic[0]['@type'] === 'RScript'">
-                                        <img src="js/dyntree/skin/../../../css/dyntree/skin/Rlogo.png" alt=""> File: <input name="r-script-file-{{analysisGroup.id}}" ng-model="a.statistic[0].fileName" existingfile required>
+                                        <img src="js/dyntree/skin/../../../css/dyntree/skin/Rlogo.png" alt=""> File: 
+                                        <input name="r-script-file-{{analysisGroup.id}}" ng-model="a.statistic[0].fileName" existingfile required class="form-control">
                                         <!--<div ngMessages="form['r-script-file-'+{{analysisGroup.id}}]" roles="alert">
                                             <span ngMessage="required">The file name can not be empty</span>
                                             <span ngMessage="$error">The specified file does not exist or it is empty.</span>
@@ -482,7 +486,7 @@
                                         </span>
                                     </div>
                                 </td>
-                                <td class="col-lg-4 col-md-4">
+                                <td>
                                     <div ng-if="a.statistic[0]['@type'] != 'RScript'">
                                     <div class="dropdown show">
                                         <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -642,7 +646,7 @@
                             </h5>
                             <ul>
                                 <li ng-repeat="f in r.results">
-                                    File: <input id="raw-results-file" name="raw-results-file" ng-model="f.file.name" existingfile required>
+                                    File: <input id="raw-results-file" name="raw-results-file" ng-model="f.file.name" existingfile required class="form-control">
                                     <!-- <div>
                                         <span ng-show="form.raw-results-file.$error.required">The file name can not be empty.</span>
                                         <span ng-show="!form.raw-results-file.$valid">The specified file does not exist or it is empty.</span>
@@ -706,5 +710,4 @@
     .ta-bind {
         min-height: 20px !important;
     }
-
 </style>
