@@ -428,7 +428,7 @@
                                         <option value="NHST">Null Hypothesis Test</option>
                                         <option value="RScript">R Script</option>
                                         <optgroup label="Charts">
-                                            <option value="Boxplot">Box plot</option>
+                                            <option value="BoxPlot">Box plot</option>
                                             <option value="Histogram">Histogram</option>
                                             <option value="ScatterPlot">Scatter plot</option>
                                         </optgroup>
