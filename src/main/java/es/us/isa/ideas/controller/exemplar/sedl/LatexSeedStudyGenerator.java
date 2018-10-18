@@ -533,9 +533,12 @@ public class LatexSeedStudyGenerator {
     private String generateAssignment(BasicExperiment exp) {
         String result = "\\subsection{Assignment of subjects to groups}\n";
         FullySpecifiedExperimentalDesign design = (FullySpecifiedExperimentalDesign) exp.getDesign().getExperimentalDesign();
-        result += "The sampling strategy was " + (design.getAssignmentMethod().isRandom() ? "random." : "custom.");
-        if (design.getAssignmentMethod().getDescription() != null && !"".equals(design.getAssignmentMethod()));
-            result += design.getAssignmentMethod().getDescription();
+        if(design!=null && design.getAssignmentMethod()!=null){
+            result += "The assignment strategy was " + (design.getAssignmentMethod().isRandom() ? "random." : "custom.");
+            if (design.getAssignmentMethod().getDescription() != null && !"".equals(design.getAssignmentMethod()));
+                result += design.getAssignmentMethod().getDescription();
+        }else
+            result+="The assignment strategy was random.";
         result += "\n";
         return result;
     }
