@@ -65,6 +65,7 @@ public class LatexSeedStudyGenerator {
     private List<URL> dependences;
     private SEDL4PeopleMarshaller marshaller;
     private html2latex.Parser html2LatexParser;
+    private String path;
 
     public LatexSeedStudyGenerator() {
         this("article", new HashMap<String, List<String>>());
@@ -72,6 +73,7 @@ public class LatexSeedStudyGenerator {
         importedPackages.put("hyperref", Collections.EMPTY_LIST);
         importedPackages.put("inputenc", Lists.newArrayList("latin1"));
         importedPackages.put("babel", Lists.newArrayList("english"));
+        importedPackages.put("graphicx", Collections.EMPTY_LIST);
         dependences = new ArrayList<>();
         this.marshaller = new SEDL4PeopleMarshaller();
         html2LatexParser = new Parser();
@@ -82,11 +84,19 @@ public class LatexSeedStudyGenerator {
         this.importedPackages = importedPackages;
     }
 
-    public String generate(ControlledExperiment exp, String additionalInfo) {
+    public String generate(ControlledExperiment exp, String additionalInfoContent) {
         StringBuilder builder = new StringBuilder();
+        SeedStudyAdditionalData additionalInfo=null;
+        ObjectMapper om = new ObjectMapper();
+            try {
+                additionalInfo = om.readValue(additionalInfoContent, SeedStudyAdditionalData.class);
+             } catch (IOException ex) {
+                Logger.getLogger(LatexSeedStudyGenerator.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+                ex.printStackTrace();
+            }
         builder.append(generatePreamble(exp))
                 .append(generateFrontMatter(exp))
-                .append(generateBody(exp))
+                .append(generateBody(exp, additionalInfo))
                 .append(generateAppendixes(exp, additionalInfo))
                 .append(generateClosing(exp));
         return builder.toString();
@@ -126,8 +136,8 @@ public class LatexSeedStudyGenerator {
                 + "\n";
     }
 
-    private String generateBody(ControlledExperiment exp) {
-        return generateIntro(exp)
+    private String generateBody(ControlledExperiment exp,SeedStudyAdditionalData additionalInfo) {
+        return generateIntro(exp,additionalInfo)
                 + generateVariables(exp)
                 + generateHypotheses(exp)
                 + generateDesign(exp)
@@ -135,10 +145,10 @@ public class LatexSeedStudyGenerator {
                 + generateAnalyses(exp) + "\n";
     }
 
-    private String generateIntro(ControlledExperiment exp) {
+    private String generateIntro(ControlledExperiment exp,SeedStudyAdditionalData additionalInfo) {
         String result = "\\section{Introduction}\n\\label{sec:intro}\n";
         result += generateGoal(exp);
-        result += generateReportContents(exp);
+        result += generateReportContents(exp,additionalInfo);
         return result;
     }
 
@@ -160,7 +170,7 @@ public class LatexSeedStudyGenerator {
         return result;
     }
 
-    private String generateReportContents(ControlledExperiment exp) {
+    private String generateReportContents(ControlledExperiment exp,SeedStudyAdditionalData additionalInfo) {
         return "\n\nThe remainder of this report is structured as follows: "
                 + "section \\ref{sec:variables} decribes the variables taking into account in the experiment. "
                 + "Section \\ref{sec:hypotheses} describes the research hypotheses. "
@@ -170,8 +180,19 @@ public class LatexSeedStudyGenerator {
                 + "Finally, section \\ref{sec:conclusions} describes the conclusions drawn from the study.";
     }
 
-    private String generateAppendixes(ControlledExperiment exp, String additionalInfo) {
-        return generateAcnowledgements(exp) + "\\appendix\n" + generateMaterialsListing(exp, additionalInfo);
+    private String generateAppendixes(ControlledExperiment exp, SeedStudyAdditionalData additionalInfo) {
+        String result=generateAcnowledgements(exp);
+        if(additionalInfo!=null && (additionalInfo.getStatsComputation()!=null || additionalInfo.getWorkspaceContents()!=null)){
+            String statResults="";
+            if(additionalInfo.getStatsComputation()!=null)
+                statResults=generateStatisticalResults(exp, additionalInfo);
+            String workspaceContents="";
+            if(additionalInfo.getWorkspaceContents()!=null)
+                workspaceContents=generateMaterialsListing(exp, additionalInfo);            
+            result  += "\\appendix\n" + statResults + workspaceContents;
+        }
+        return result;
+        
     }
 
     private String generateTitle(ControlledExperiment exp) {
@@ -179,7 +200,7 @@ public class LatexSeedStudyGenerator {
                 + exp.getId()
                 + "\\footnote{"
                 + "Generated automatically by "
-                + "\\href{http://exemplar.us.es}{EXEMPLAR}"
+                + "\\href{https://exemplar.us.es}{EXEMPLAR}"
                 + "}"
                 + "}\n";
     }
@@ -353,24 +374,18 @@ public class LatexSeedStudyGenerator {
         return result;
     }
 
-    private String generateMaterialsListing(ControlledExperiment exp, String additionalInfo) {
+    private String generateMaterialsListing(ControlledExperiment exp, SeedStudyAdditionalData additionalInfo) {
 
         StringBuilder sb = new StringBuilder();
-        if (additionalInfo != null && !"".equals(additionalInfo)) {
-
-            ObjectMapper om = new ObjectMapper();
-            try {
-                Node[] nodes = om.readValue(additionalInfo, Node[].class);
+        if (additionalInfo != null && !"".equals(additionalInfo)) {           
                 sb.append("\\section{Materials}\n\\label{sec:materials}\n");
-                sb.append("\\begin{itemize}\n");
-                for (Node n : nodes) {
+                sb. append("This section provides an exhaustive listing of the contents of the laboratory"
+                        + "package as stored in the \\href{https://exemplar.us.es}{EXEMPLAR} instance used to generate this report. \n");
+                sb.append("\\begin{itemize}\n");                
+                for (Node n : additionalInfo.getWorkspaceContents()) {
                     sb.append("    \\item \n" + printNode(n, "     "));
                 }
-                sb.append("\\end{itemize}\n");
-            } catch (IOException ex) {
-                Logger.getLogger(LatexSeedStudyGenerator.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-                ex.printStackTrace();
-            }
+                sb.append("\\end{itemize}\n");           
 
         }
         return sb.toString();
@@ -502,7 +517,7 @@ public class LatexSeedStudyGenerator {
     private String generateAcnowledgements(ControlledExperiment exp) {
         return "\\section*{Acnowledgements}\n "
                 + "The authors of this experiments are grateful to the "
-                + "\\href{http://exemplar.us.es}{EXEMPLAR} development team for "
+                + "\\href{https://exemplar.us.es}{EXEMPLAR} development team for "
                 + "providing such a wonderful tool.\n";
     }
 
@@ -517,11 +532,11 @@ public class LatexSeedStudyGenerator {
     }
 
     private String generateAssignment(ControlledExperiment exp) {
-        String result = "\\subsection{Sampling}\n";
+        String result = "\\subsection{Assignment of subjects to groups}\n";
         FullySpecifiedExperimentalDesign design = (FullySpecifiedExperimentalDesign) exp.getDesign().getExperimentalDesign();
         result += "The sampling strategy was " + (design.getAssignmentMethod().isRandom() ? "random." : "custom.");
         if (design.getAssignmentMethod().getDescription() != null && !"".equals(design.getAssignmentMethod()));
-        result += design.getAssignmentMethod().getDescription();
+            result += design.getAssignmentMethod().getDescription();
         result += "\n";
         return result;
     }
@@ -658,7 +673,7 @@ public class LatexSeedStudyGenerator {
     public String html2latex(String htmlContent) {
         String result = htmlContent;
         try {
-            result = html2LatexParser.parse("<span>"+htmlContent+"</span>",".");
+            result = html2LatexParser.parse("<span>"+htmlContent+"</span>",path);
         } catch (FatalErrorException ex) {
             Logger.getLogger(LatexSeedStudyGenerator.class.getName()).log(java.util.logging.Level.SEVERE, "ERROR transforming html text to latex:" + ex.getMessage(), ex);
             ex.printStackTrace();
@@ -719,5 +734,20 @@ public class LatexSeedStudyGenerator {
             result+="\\textbf{ Annotated at '"+line.getTimestamp().toGMTString()+"'}:";
         result+=html2latex(line.getMessage());
         return result;
+    }
+    
+    private String generateStatisticalResults(ControlledExperiment exp, SeedStudyAdditionalData additionalInfo){
+        StringBuilder sb = new StringBuilder();
+        path=buildPath(additionalInfo);
+        if (additionalInfo != null && !"".equals(additionalInfo)) {           
+                sb.append("\\section{Statistical Analysis Results}\n\\label{sec:stat-results}\n");
+                sb.append("Resutls of the execution of the statistical analysis in the \\href{https://exemplar.us.es}{EXEMPLAR} console:\n");
+                sb.append(html2latex(additionalInfo.getStatsComputation()));                
+        }
+        return sb.toString();
+    }
+    
+    private String buildPath(SeedStudyAdditionalData additionalInfo){
+        return "./ideas-repo/"+additionalInfo.getCurrentUser()+"/"+additionalInfo.getCurrentWorkspace()+"/"+additionalInfo.getCurrentProject();
     }
 }

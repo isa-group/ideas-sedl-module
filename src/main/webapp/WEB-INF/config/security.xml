@@ -17,8 +17,7 @@
 
 		<security:port-mappings>
 			<security:port-mapping http="8888" https="8881" />
-		</security:port-mappings>
-
+		</security:port-mappings>                
 	</security:http>
 
 </beans>

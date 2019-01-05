@@ -1021,25 +1021,85 @@ $scope.uploadRawDataFile = function(configId,runId,f){
     
 }
 
-$scope.generateStudySeed=function(){
-    FileApi.loadWorkspace(WorkspaceManager.getSelectedWorkspace(), function(ts){
+$scope.generateStudySeedWithContents=function(workspaceContents,statAnalysisResult){
+    var param={
+                    "workspaceContents": workspaceContents, 
+                    "statsComputation": statAnalysisResult,
+                    "currentUser":principalUserName,
+                    "currentWorkspace":WorkspaceManager.getSelectedWorkspace() ,
+                    "currentProject": currentSelectedNode.data.keyPath.substr(0, currentSelectedNode.data.keyPath.indexOf('/'))
+            };
     CommandApi.doDocumentOperation("generateSeedStudy", {}, EditorManager.currentUri, function (latex) {
         showContentAsModal("app/modalWindows/createNewFileOfLanguage?language=tex&languageId=ideas-latex-language",
-                    function () {
-                            createNewFile("ideas-latex-language", ".tex",function(furi){
-                                console.info("Saving on "+furi+" the content '"+latex.message+"'");
-                                FileApi.saveFileContents(furi, latex.message, function (result) {
-                                    EditorManager.openFile(furi,function(){
-                                        var model = ModeManager.getMode("ideas-latex-language");
-                                        launchOperation(model,"compileToPDF", furi);
-                                    });
-                                    
-                                });
-                            });
-                        }
-                        );
-                },false,JSON.stringify(ts));
-    });
+            function () {
+                if(!currentSelectedNode)
+                    $('#projectsTree').dynatree('getRoot').childList[0].click();
+                else
+                    currentSelectedNode=getNodeByFileUri(WorkspaceManager.getSelectedWorkspace() + "/" + currentSelectedNode.data.keyPath);
+                createNewFile("ideas-latex-language", ".tex",function(furi){
+                    console.info("Saving on "+furi+" the content '"+latex.message+"'");
+                    FileApi.saveFileContents(furi, latex.message, function (result) {                                  
+                        EditorManager.openFile(furi,function(){
+                            var model = ModeManager.getMode("ideas-latex-language");
+                            launchOperation(model,"compileToPDF", furi);
+                        });                                  
+                    });
+                });
+            }
+        );
+    },false,JSON.stringify(param));
+}
+
+$scope.generateStudySeed=function(){
+ CommandsRegistry.clearConsole.exec();
+ var view=null;
+ $.ajax('/ideas-sedl-language/language/operationView/generateseedreport', {
+        'type' : 'get',
+        'data' : {},
+        'success' : function(result) {
+                        view = result;
+                    },
+        'onError' : function(result) {
+                            console.log('[ERROR] '+result);
+        },
+        'async' : false,
+ });
+ var generateContent=false;
+ var generateStats=false;
+ var workspaceContents=null;
+ var statAnalysisResult=null;
+ 
+ showModal("Report content configuration",view,"Generate", 
+  function(){
+    generateContent=$("#includeMaterialsListing")[0].checked;
+    generateStats=$("#includeAnalysisResults")[0].checked;
+    hideModal();
+    if(generateStats){
+        $scope.computeAllTheStats(function(result){
+            statAnalysisResult=$(".gcli-display").html();
+            if(generateContent){
+               FileApi.loadWorkspace(WorkspaceManager.getSelectedWorkspace(), function(ts){
+                    workspaceContents=ts;
+                    $scope.generateStudySeedWithContents(workspaceContents,statAnalysisResult);
+                });
+            } else {
+                $scope.generateStudySeedWithContents(workspaceContents,statAnalysisResult);
+            }
+        });
+    }else{ 
+        if(generateContent){
+            FileApi.loadWorkspace(WorkspaceManager.getSelectedWorkspace(), function(ts){
+                workspaceContents=ts;
+                $scope.generateStudySeedWithContents(workspaceContents,statAnalysisResult);
+            });
+        } else {
+            $scope.generateStudySeedWithContents(workspaceContents,statAnalysisResult);
+        }
+    }
+  },
+  function(){hideModal();},
+  function(){hideModal();}
+ );
 }
 
 $scope.findIndexIn = function (value, set){
@@ -1061,12 +1121,29 @@ $scope.findIndexInForProperty = function (value, set,property){
     }
     return index;
 }
-
-$scope.runRScript=function(file){
+ 
+$scope.runRScript=function(file,callback){
+    CommandApi.echo("<p>Running file '"+file+"'")
     var oldFileUriOperation=fileUriOperation;
     fileUriOperation=selectedWorkspace+'/'+file;
     //EditorManager.openFile(fileUriOperation,function(content){
-        launchOperation('ideas-R-language','executeScript',fileUriOperation);
-    //}); 
+        launchOperation('ideas-R-language','executeScript',fileUriOperation, function (result) { if(callback) callback(result); });
+    //});
     fileUriOperation=oldFileUriOperation;
+}
+
+$scope.computeAllTheStats=function(callback, analysesIndex, statisticIndex){
+    if(typeof analysesIndex === 'undefined')
+        analysesIndex=-1;
+    if(typeof statisticIndex === 'undefined')
+        statisticIndex=-1;
+    for(var i=0;i<$scope.model.design.experimentalDesign.intendedAnalyses.length;i++){
+        for(var j=0;j<$scope.model.design.experimentalDesign.intendedAnalyses[i].analyses.length;j++){
+            if($scope.model.design.experimentalDesign.intendedAnalyses[i].analyses[j].statistic[0]['@type']=="RScript" && ((i>=analysesIndex && j>statisticIndex) || i>analysesIndex)){
+                $scope.runRScript($scope.model.design.experimentalDesign.intendedAnalyses[i].analyses[j].statistic[0].fileName,function(){$scope.computeAllTheStats(callback,i,j);});
+                return;
+            }
+        }
+    }
+    launchOperation('ideas-sedl-language','computestats', EditorManager.currentUri, function (result) {if(callback) callback(result)});    
 }

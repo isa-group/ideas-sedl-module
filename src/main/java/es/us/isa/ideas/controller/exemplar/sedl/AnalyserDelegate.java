@@ -279,7 +279,11 @@ class AnalyserDelegate {
 
                     response.setAnnotations(ErrorBuilder.buildAnnotationsFromValidationErrors(lError));
                 } else {                    
-                   message = message + "<br> - " + operation.renderResults();
+                    if(!operation.getResults().isEmpty()){
+                        String renderedResult=operation.renderResults();
+                        if(!"".equals(renderedResult))
+                            message = message + "<br> - " + renderedResult;
+                    }
                     
                 }
                 message = message + "<br>";
