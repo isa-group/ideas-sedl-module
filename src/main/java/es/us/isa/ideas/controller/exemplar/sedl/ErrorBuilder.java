@@ -6,7 +6,7 @@ import java.util.List;
 
 import es.us.isa.ideas.module.common.AppAnnotations;
 import es.us.isa.ideas.module.common.AppAnnotations.Type;
-import es.us.isa.sedl.core.BasicExperiment;
+import es.us.isa.sedl.core.ControlledExperiment;
 import es.us.isa.sedl.core.util.Error;
 import es.us.isa.sedl.core.util.Error.ERROR_SEVERITY;
 import es.us.isa.sedl.error.SEDL4PeopleError;
@@ -89,7 +89,7 @@ public class ErrorBuilder {
 		System.out.println("Building errors: " + lErrors.toString());
 		String result = "[";
 		for (int i = 0; i < lErrors.size(); i++) {
-			ValidationError<BasicExperiment> err = (ValidationError)lErrors.get(i);
+			ValidationError<ControlledExperiment> err = (ValidationError)lErrors.get(i);
 			if (i != 0) {
 				result += ",";
 			}

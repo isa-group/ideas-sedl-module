@@ -15,8 +15,8 @@ import es.us.isa.ideas.module.common.AppAnnotations;
 import es.us.isa.ideas.module.common.AppResponse;
 import es.us.isa.ideas.module.common.AppResponse.Status;
 import es.us.isa.ideas.module.controller.BaseLanguageController;
-import es.us.isa.sedl.core.BasicExperiment;
-import es.us.isa.sedl.core.Experiment;
+import es.us.isa.sedl.core.ControlledExperiment;
+import es.us.isa.sedl.core.EmpiricalStudy;
 import es.us.isa.sedl.core.util.Error;
 import es.us.isa.sedl.core.util.SEDLMarshaller;
 import es.us.isa.sedl.core.util.xml.XMLMarshaller;
@@ -78,7 +78,7 @@ public class SEDLLanguageController extends BaseLanguageController {
 		AppResponse appResponse = new AppResponse();
 		SEDL4PeopleUnmarshaller unmarshaller = new SEDL4PeopleUnmarshaller();
                 unmarshaller.setEpUnmarshaller(new SEDL4PeopleExtensionPointsUnmarshallerImplementation());
-		Experiment experiment = unmarshaller.fromString(content);
+		EmpiricalStudy experiment = unmarshaller.fromString(content);
 		
 		boolean problems = false;
 		
@@ -123,7 +123,7 @@ public class SEDLLanguageController extends BaseLanguageController {
 				SEDL4PeopleUnmarshaller sedl4peopleUnmarsh = new SEDL4PeopleUnmarshaller();
 				SEDLMarshaller xmlMarsh = new XMLMarshaller();
 				OutputStream outStream = new ByteArrayOutputStream();
-				Experiment exp = sedl4peopleUnmarsh.fromString(content);
+				EmpiricalStudy exp = sedl4peopleUnmarsh.fromString(content);
 				xmlData = es.us.isa.sedl.jlibsedl.JLibSEDL.getXML(exp, outStream, xmlMarsh);
 				appResponse.setStatus(Status.OK);
 			} catch ( Exception e ) {   
@@ -143,9 +143,9 @@ public class SEDLLanguageController extends BaseLanguageController {
 			try {
                             //SEDL4PeopleMarshaller marshaller = new SEDL4PeopleMarshaller();
                             SEDL4PeopleStringTemplateMarshaller marshaller = new SEDL4PeopleStringTemplateMarshaller();
-				XMLUnmarshaller<BasicExperiment> xmlUnmarsh = new XMLUnmarshaller<BasicExperiment>();
+				XMLUnmarshaller<ControlledExperiment> xmlUnmarsh = new XMLUnmarshaller<ControlledExperiment>();
 				InputStream inStream = new ByteArrayInputStream(content.getBytes("UTF-8"));
-				Experiment exp = xmlUnmarsh.load(BasicExperiment.class, inStream);
+				EmpiricalStudy exp = xmlUnmarsh.load(ControlledExperiment.class, inStream);
 				data = marshaller.asString(exp);
 				appResponse.setStatus(Status.OK);
 			} catch ( Exception e ) {
@@ -161,7 +161,7 @@ public class SEDLLanguageController extends BaseLanguageController {
                     try {
                         SEDL4PeopleUnmarshaller sedl4peopleUnmarsh = new SEDL4PeopleUnmarshaller();
                         sedl4peopleUnmarsh.setEpUnmarshaller(new SEDL4PeopleExtensionPointsUnmarshallerImplementation());
-                        Experiment exp = sedl4peopleUnmarsh.fromString(content);
+                        EmpiricalStudy exp = sedl4peopleUnmarsh.fromString(content);
                         JSONMarshaller marshaller=new JSONMarshaller();
                         appResponse.setData(marshaller.asString(exp));
                         appResponse.setFileUri(fileUri);
@@ -175,7 +175,7 @@ public class SEDLLanguageController extends BaseLanguageController {
                 }else if (currentFormat.equals("json") && desiredFormat.equals("sedl") ) {
                     try {
                         JSONUnmarshaller sedl4peopleUnmarsh = new JSONUnmarshaller();
-                        Experiment exp = sedl4peopleUnmarsh.fromString(content);
+                        EmpiricalStudy exp = sedl4peopleUnmarsh.fromString(content);
                         SEDL4PeopleMarshaller marshaller=new SEDL4PeopleMarshaller();
                         appResponse.setData(marshaller.asString(exp));
                         appResponse.setFileUri(fileUri);
@@ -215,6 +215,6 @@ public class SEDLLanguageController extends BaseLanguageController {
 	@ResponseBody
         public ModelAndView getModulesLoaded(){
             return new ModelAndView("modulesLoaded");
-        }
+        }        
 
 }
