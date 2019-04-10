@@ -15,7 +15,7 @@ import es.us.isa.sedl.analysis.operations.information.SampleSize;
 import es.us.isa.sedl.analysis.operations.validation.MultipleComparison;
 import es.us.isa.sedl.analysis.operations.validation.OutOfRange;
 import es.us.isa.sedl.analysis.operations.validation.SmallSampling;
-import es.us.isa.sedl.core.BasicExperiment;
+import es.us.isa.sedl.core.ControlledExperiment;
 import es.us.isa.sedl.core.design.FullySpecifiedExperimentalDesign;
 import es.us.isa.sedl.core.design.Variable;
 import es.us.isa.sedl.core.execution.Execution;
@@ -92,15 +92,15 @@ class AnalyserDelegate {
 
         try {
 
-            BasicExperiment exp = getExperimentFromCode(content);
-            List<ValidationError<BasicExperiment>> errors = sampling.validate(exp);
+            ControlledExperiment exp = getExperimentFromCode(content);
+            List<ValidationError<ControlledExperiment>> errors = sampling.validate(exp);
             if (!errors.isEmpty()) {
                 response.setMessage("Check for sample size problems.");
                 FullySpecifiedExperimentalDesign design = (FullySpecifiedExperimentalDesign) exp.getDesign().getExperimentalDesign();
                 RuleNode ctx = sedl4peopleUnmarsh.getListener().getObjectNodeMap().get(design.getGroups());
                 List<RuleNode> lCtx = new ArrayList<RuleNode>();
                 lCtx.add(ctx);
-                List<ValidationError<BasicExperiment>> error = sedlDelegate.fillValidationError(lCtx, sedl4peopleUnmarsh.getTokens(), errors);
+                List<ValidationError<ControlledExperiment>> error = sedlDelegate.fillValidationError(lCtx, sedl4peopleUnmarsh.getTokens(), errors);
                 response.setAnnotations(ErrorBuilder.buildAnnotationsFromValidationErrors(error));
             } else {
                 response.setMessage("Experiment sample size is correct.");
@@ -119,8 +119,8 @@ class AnalyserDelegate {
         AppResponse response = constructBaseResponse(fileUri);
 
         try {
-            BasicExperiment exp = getExperimentFromCode(content);
-            List<ValidationError<BasicExperiment>> errors = multipleComparison.validate(exp);
+            ControlledExperiment exp = getExperimentFromCode(content);
+            List<ValidationError<ControlledExperiment>> errors = multipleComparison.validate(exp);
 
             //TODO: Refactor: Quick fix for showing correct line. (Demo 7/3/14)
             if (errors.size() > 0) {
@@ -139,7 +139,7 @@ class AnalyserDelegate {
                     } else {
                         List<RuleNode> lCtx = new ArrayList<RuleNode>();
                         lCtx.add(ctx);
-                        List<ValidationError<BasicExperiment>> lVal = sedlDelegate.fillValidationError(lCtx, sedl4peopleUnmarsh.getTokens(), errors);
+                        List<ValidationError<ControlledExperiment>> lVal = sedlDelegate.fillValidationError(lCtx, sedl4peopleUnmarsh.getTokens(), errors);
                         response.setAnnotations(ErrorBuilder.buildAnnotationsFromValidationErrors(lVal));
 //						result = ErrorBuilder.buildValidationErrorStructure(sedlDelegate.fillValidationError(lCtx, sedl4peopleUnmarsh.getTokens(), errors));
                     }
@@ -160,8 +160,8 @@ class AnalyserDelegate {
 
         AppResponse response = constructBaseResponse(fileUri);
         try {
-            BasicExperiment exp = getExperimentFromCode(content);
-            List<ValidationError<BasicExperiment>> errors = new ArrayList<ValidationError<BasicExperiment>>();
+            ControlledExperiment exp = getExperimentFromCode(content);
+            List<ValidationError<ControlledExperiment>> errors = new ArrayList<ValidationError<ControlledExperiment>>();
             if (csvContent.equals("")) {
                 errors = outOfRange.validate(exp);
             } else {
@@ -172,7 +172,7 @@ class AnalyserDelegate {
                 response.setMessage("Range of variables are correct");
             } else {
                 String msg = "<div class='opError'>";
-                for (ValidationError<BasicExperiment> ve : errors) {
+                for (ValidationError<ControlledExperiment> ve : errors) {
                     msg = msg + "<br>" + ve.getMessage() + " -Severity: " + ve.getSeverity();
                 }
                 msg = msg + "</div>";
@@ -182,7 +182,7 @@ class AnalyserDelegate {
                 RuleNode ctx = sedl4peopleUnmarsh.getListener().getObjectNodeMap().get(design.getIntendedAnalyses());
                 List<RuleNode> lCtx = new ArrayList<RuleNode>();
                 lCtx.add(ctx);
-                List<ValidationError<BasicExperiment>> error = sedlDelegate.fillValidationError(lCtx, sedl4peopleUnmarsh.getTokens(), errors);
+                List<ValidationError<ControlledExperiment>> error = sedlDelegate.fillValidationError(lCtx, sedl4peopleUnmarsh.getTokens(), errors);
                 //response.setAnnotations(ErrorBuilder.buildAnnotationsFromValidationErrors(error));
             }
         } catch (Exception e) {
@@ -197,8 +197,8 @@ class AnalyserDelegate {
         System.out.println("[INFO-SEDL-Lenguage] outofrange");
         AppResponse response = constructBaseResponse(fileUri);
         try {
-            BasicExperiment exp = getExperimentFromCode(content);
-            List<ValidationError<BasicExperiment>> errors = new ArrayList<ValidationError<BasicExperiment>>();
+            ControlledExperiment exp = getExperimentFromCode(content);
+            List<ValidationError<ControlledExperiment>> errors = new ArrayList<ValidationError<ControlledExperiment>>();
             List<String> csvRoots = outOfRange.parseDocument(exp);
             String result = "";
 
@@ -236,8 +236,8 @@ class AnalyserDelegate {
     public AppResponse computeStats(String content, String fileUri) {
         AppResponse response = constructBaseResponse(fileUri);
         try {
-            BasicExperiment exp = getExperimentFromCode(content);
-            List<ValidationError<BasicExperiment>> errors = new ArrayList<ValidationError<BasicExperiment>>();
+            ControlledExperiment exp = getExperimentFromCode(content);
+            List<ValidationError<ControlledExperiment>> errors = new ArrayList<ValidationError<ControlledExperiment>>();
             List<String> csvRoots = computeStats.getCandidateDatasetFiles(exp);
             String result = "";
 
@@ -254,7 +254,7 @@ class AnalyserDelegate {
     public AppResponse computeStatsCalc(String content, String fileUri, String csvContent) {
         AppResponse response = constructBaseResponse(fileUri);
         try {
-            BasicExperiment exp = getExperimentFromCode(content);
+            ControlledExperiment exp = getExperimentFromCode(content);
             List errors = new ArrayList();
             List<StatisticalAnalysisOperation> result = new ArrayList<StatisticalAnalysisOperation>();
             if (csvContent.equals("")) {
@@ -302,10 +302,10 @@ class AnalyserDelegate {
         AppResponse response = constructBaseResponse(fileUri);
         String columnSeparator = ";";
         try {
-            BasicExperiment exp = getExperimentFromCode(content);
+            ControlledExperiment exp = getExperimentFromCode(content);
             List errors = new ArrayList();
             StringBuilder message = new StringBuilder("SubjectId");
-            for (Variable var : exp.getDesign().getVariables().getVariable()) {
+            for (Variable var : exp.getDesign().getVariables().getVariables()) {
                 message.append(columnSeparator);
                 message.append(var.getName());
             }
@@ -322,7 +322,7 @@ class AnalyserDelegate {
         AppResponse response = constructBaseResponse(fileUri);
         String columnSeparator = ";";
         try {
-            BasicExperiment exp = getExperimentFromCode(content);
+            ControlledExperiment exp = getExperimentFromCode(content);
             List errors = new ArrayList();
             LatexSeedStudyGenerator studyGenerator = new LatexSeedStudyGenerator();
             response.setMessage(studyGenerator.generate(exp, additionalInfo));
@@ -342,8 +342,8 @@ class AnalyserDelegate {
         return appResponse;
     }
 
-    private BasicExperiment getExperimentFromCode(String code) {
-        BasicExperiment exp = (BasicExperiment) sedl4peopleUnmarsh
+    private ControlledExperiment getExperimentFromCode(String code) {
+        ControlledExperiment exp = (ControlledExperiment) sedl4peopleUnmarsh
                 .fromString(code);
         return exp;
     }
