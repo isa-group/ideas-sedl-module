@@ -402,7 +402,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>15.0</version>
+            <version>r03</version>
             <classifier>cdi1.0</classifier>
         </dependency>                                                        
         <!-- HTML2Latex -->
